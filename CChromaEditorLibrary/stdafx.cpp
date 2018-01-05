@@ -1632,6 +1632,48 @@ extern "C"
 		return 0;
 	}
 
+	EXPORT_API int PluginSetUseKeyboardCustomKeyType(int animationId, bool enabled)
+	{
+		AnimationBase* animation = GetAnimationInstance(animationId);
+		if (nullptr == animation)
+		{
+			return 0;
+		}
+		if (animation->GetDeviceType() == EChromaSDKDeviceTypeEnum::DE_2D &&
+			animation->GetDeviceId() == (int)EChromaSDKDevice2DEnum::DE_Keyboard)
+		{
+			PluginStopAnimation(animationId);
+			PluginUnloadAnimation(animationId);
+			Animation2D* animation2D = (Animation2D*)(animation);
+			animation2D->SetUseKeyboardCustomKeyType(enabled);
+		}
+		return 0;
+	}
+
+	EXPORT_API int PluginSetUseKeyboardCustomKeyTypeName(const char* path, bool enabled)
+	{
+		int animationId = PluginGetAnimation(path);
+		if (animationId < 0)
+		{
+			LogError("PluginToggleKeyboardCustomKeyTypeName: Animation not found! %s", path);
+			return 0;
+		}
+		return PluginSetUseKeyboardCustomKeyType(animationId, enabled);
+	}
+
+	EXPORT_API double PluginSetUseKeyboardCustomKeyTypeNameD(const char* path, double enabled)
+	{
+		if (enabled == 0)
+		{
+			PluginSetUseKeyboardCustomKeyTypeName(path, false);
+		}
+		else
+		{
+			PluginSetUseKeyboardCustomKeyTypeName(path, true);
+		}
+		return 0;
+	}
+
 	EXPORT_API int PluginGetKeyColor(int animationId, int frameId, int rzkey)
 	{
 		AnimationBase* animation = GetAnimationInstance(animationId);
@@ -1665,7 +1707,7 @@ extern "C"
 		return PluginGetKeyColor(animationId, frameId, rzkey);
 	}
 
-	EXPORT_API double PluginGetKeyColorD(const char* path, double frameId, double rzkey)
+	EXPORT_API double PluginGetKeyColorNameD(const char* path, double frameId, double rzkey)
 	{
 		return (double)PluginGetKeyColorName(path, (int)frameId, (int)rzkey);
 	}

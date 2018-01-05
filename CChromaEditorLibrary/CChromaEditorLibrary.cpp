@@ -262,6 +262,25 @@ void CMainViewDlg::SaveFile()
 			}
 		}
 
+		if ((EChromaSDKDevice2DEnum)device == EChromaSDKDevice2DEnum::DE_Keyboard)
+		{
+			expectedSize = sizeof(int);
+			AnimationBase* animation = GetAnimation();
+			if (animation != nullptr)
+			{
+				Animation2D* animation2D = dynamic_cast<Animation2D*>(animation);
+				if (animation2D != nullptr)
+				{
+					int flags = 0;
+					if (animation2D->HasKeyboardCustomKeyType())
+					{
+						flags = 1;
+					}
+					fwrite(&flags, expectedSize, 1, stream);
+				}
+			}
+		}
+
 		fflush(stream);
 		std::fclose(stream);
 	}
@@ -325,6 +344,11 @@ CStatic* CMainViewDlg::GetControlFrames()
 CEdit* CMainViewDlg::GetControlDuration()
 {
 	return (CEdit*)GetDlgItem(IDC_EDIT_DURATION);
+}
+
+CButton* CMainViewDlg::GetControlUseKeyboardCustomKeys()
+{
+	return (CButton*)GetDlgItem(IDC_CHECK_USE_KEYBOARD_CUSTOM_KEY_TYPE);
 }
 
 void CMainViewDlg::UpdateOverrideTime(float time)
@@ -400,6 +424,21 @@ void CMainViewDlg::RefreshDevice()
 	GetControlSetLEDLabel()->ShowWindow(show);
 	GetControlSetLEDCombo()->ShowWindow(show);
 	GetControlSetLEDButton()->ShowWindow(show);
+
+	show = _mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keyboard;
+	GetControlUseKeyboardCustomKeys()->ShowWindow(show);
+	if (show)
+	{
+		Animation2D* animation2D = (Animation2D*)GetAnimation();
+		if (animation2D->HasKeyboardCustomKeyType())
+		{
+			GetControlUseKeyboardCustomKeys()->SetCheck(BST_CHECKED);
+		}
+		else
+		{
+			GetControlUseKeyboardCustomKeys()->SetCheck(BST_UNCHECKED);
+		}
+	}
 }
 
 void CMainViewDlg::RecreateGrid()
@@ -807,6 +846,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedButtonImportAnimation)
 	ON_BN_CLICKED(IDC_BUTTON_IMPORT_OVERRIDE_TIME, &CMainViewDlg::OnBnClickedButtonImportOverrideTime)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DEVICE, &CMainViewDlg::OnBnClickedButtonSetDevice)
+	ON_BN_CLICKED(IDC_CHECK_USE_KEYBOARD_CUSTOM_KEY_TYPE, &CMainViewDlg::OnBnClickedCheckUseKeyboardKeyType)
 	ON_BN_CLICKED(IDC_BUTTON_CLEAR, &CMainViewDlg::OnBnClickedButtonClear)
 	ON_BN_CLICKED(IDC_BUTTON_FILL, &CMainViewDlg::OnBnClickedButtonFill)
 	ON_BN_CLICKED(IDC_BUTTON_RANDOM, &CMainViewDlg::OnBnClickedButtonRandom)
@@ -852,6 +892,9 @@ void CMainViewDlg::SetColor(COLORREF color)
 
 void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	if (nID >= ID_DYNAMIC_BUTTON_MIN)
 	{
 		if (nID < ID_DYNAMIC_COLOR_MIN)
@@ -947,6 +990,9 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 
 void CMainViewDlg::OnBnClickedButtonSetDeviceType()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	bool changed = false;
 	if (_mDeviceType != (EChromaSDKDeviceTypeEnum)GetControlDeviceType()->GetCurSel())
 	{
@@ -994,6 +1040,9 @@ void CMainViewDlg::OnBnClickedButtonSetDeviceType()
 
 void CMainViewDlg::OnBnClickedButtonImportImage()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	EditorAnimationBase* editor = GetEditor();
 	if (editor == nullptr)
 	{
@@ -1011,6 +1060,9 @@ void CMainViewDlg::OnBnClickedButtonImportImage()
 
 void CMainViewDlg::OnBnClickedButtonImportAnimation()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	EditorAnimationBase* editor = GetEditor();
 	if (editor == nullptr)
 	{
@@ -1028,6 +1080,9 @@ void CMainViewDlg::OnBnClickedButtonImportAnimation()
 
 void CMainViewDlg::OnBnClickedButtonImportOverrideTime()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	float time = GetOverrideTime();
 	_mOverrideTime = time;
 	switch (_mDeviceType)
@@ -1047,9 +1102,49 @@ void CMainViewDlg::OnBnClickedButtonImportOverrideTime()
 	OnBnClickedButtonPreview();
 }
 
+void CMainViewDlg::OnBnClickedCheckUseKeyboardKeyType()
+{
+	// stop animation
+	OnBnClickedButtonStop();
+
+	// unload animation
+	OnBnClickedButtonUnload();
+
+	bool changed = false;
+	AnimationBase* animation = CMainViewDlg::GetAnimation();
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D)
+	{
+		Animation2D* animation2D = (Animation2D*)animation;
+		CButton* checkControl = GetControlUseKeyboardCustomKeys();
+		bool isChecked = checkControl->GetCheck() == BST_CHECKED;
+		animation2D->SetUseKeyboardCustomKeyType(isChecked);
+		changed = true;
+	}
+
+	if (changed)
+	{
+		// Save the file
+		SaveFile();
+
+		// Create the grid buttons
+		RecreateGrid();
+
+		// Display enums
+		RefreshDevice();
+
+		// Display grid
+		RefreshGrid();
+	}
+
+	//show changes
+	OnBnClickedButtonPreview();
+}
 
 void CMainViewDlg::OnBnClickedButtonSetDevice()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	bool changed = false;
 	switch (_mDeviceType)
 	{
@@ -1083,6 +1178,9 @@ void CMainViewDlg::OnBnClickedButtonSetDevice()
 
 void CMainViewDlg::OnBnClickedButtonClear()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1131,6 +1229,9 @@ void CMainViewDlg::OnBnClickedButtonClear()
 
 void CMainViewDlg::OnBnClickedButtonFill()
 {
+	//stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1192,6 +1293,9 @@ void CMainViewDlg::OnBnClickedButtonFill()
 
 void CMainViewDlg::OnBnClickedButtonRandom()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1240,6 +1344,9 @@ void CMainViewDlg::OnBnClickedButtonRandom()
 
 void CMainViewDlg::OnBnClickedButtonCopy()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1282,6 +1389,9 @@ void CMainViewDlg::OnBnClickedButtonCopy()
 
 void CMainViewDlg::OnBnClickedButtonPaste()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1432,6 +1542,9 @@ void CMainViewDlg::OnBnClickedButtonStop()
 
 void CMainViewDlg::OnBnClickedButtonLoad()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	if (GetAnimation() != nullptr)
 	{
 		GetAnimation()->Load();
@@ -1441,6 +1554,9 @@ void CMainViewDlg::OnBnClickedButtonLoad()
 
 void CMainViewDlg::OnBnClickedButtonUnload()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	if (GetAnimation() != nullptr)
 	{
 		GetAnimation()->Unload();
@@ -1450,6 +1566,9 @@ void CMainViewDlg::OnBnClickedButtonUnload()
 
 void CMainViewDlg::OnBnClickedButtonSetKey()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D &&
 		_mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keyboard)
 	{
@@ -1477,6 +1596,9 @@ void CMainViewDlg::OnBnClickedButtonSetKey()
 
 void CMainViewDlg::OnBnClickedButtonSetLed()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D &&
 		_mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Mouse)
 	{
@@ -1505,6 +1627,9 @@ void CMainViewDlg::OnBnClickedButtonSetLed()
 
 void CMainViewDlg::OnBnClickedButtonPrevious()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1550,6 +1675,9 @@ void CMainViewDlg::OnBnClickedButtonPrevious()
 
 void CMainViewDlg::OnBnClickedButtonNext()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1595,6 +1723,9 @@ void CMainViewDlg::OnBnClickedButtonNext()
 
 void CMainViewDlg::OnBnClickedButtonAdd()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1617,6 +1748,9 @@ void CMainViewDlg::OnBnClickedButtonAdd()
 
 void CMainViewDlg::OnBnClickedButtonDelete()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1687,6 +1821,9 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 
 void CMainViewDlg::OnBnClickedButtonReset()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	AnimationBase* animation = GetAnimation();
 	if (animation != nullptr)
 	{
@@ -1703,6 +1840,9 @@ void CMainViewDlg::OnBnClickedButtonReset()
 
 void CMainViewDlg::OnBnClickedButtonSetDuration()
 {
+	// stop animation
+	OnBnClickedButtonStop();
+
 	switch (_mDeviceType)
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:

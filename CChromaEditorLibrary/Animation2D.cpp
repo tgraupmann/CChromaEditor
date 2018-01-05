@@ -27,6 +27,7 @@ void Animation2D::Reset()
 	_mTime = 0.0f;
 	_mCurrentFrame = 0;
 	_mLoop = false;
+	_mUseKeyboardCustomKeyType = false;
 }
 
 EChromaSDKDeviceTypeEnum Animation2D::GetDeviceType()
@@ -90,7 +91,15 @@ void Animation2D::Load()
 		FChromaSDKColorFrame2D& frame = _mFrames[i];
 		try
 		{
-			FChromaSDKEffectResult effect = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(_mDevice, frame.Colors);
+			FChromaSDKEffectResult effect;
+			if (_mUseKeyboardCustomKeyType)
+			{
+				effect = ChromaSDKPlugin::GetInstance()->CreateEffectKeyboardCustomKey(frame.Colors);
+			}
+			else
+			{
+				effect = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(_mDevice, frame.Colors);
+			}
 			if (effect.Result != 0)
 			{
 				fprintf(stderr, "Load: Failed to create effect!\r\n");
@@ -357,6 +366,17 @@ int Animation2D::Save(const char* path)
 			}
 		}
 
+		if ((EChromaSDKDevice2DEnum)device == EChromaSDKDevice2DEnum::DE_Keyboard)
+		{
+			expectedSize = sizeof(int);
+			int flags = 0;
+			if (HasKeyboardCustomKeyType())
+			{
+				flags = 1;
+			}
+			fwrite(&flags, expectedSize, 1, stream);
+		}
+
 		fflush(stream);
 		std::fclose(stream);
 
@@ -364,4 +384,25 @@ int Animation2D::Save(const char* path)
 	}
 
 	return -1;
+}
+
+void Animation2D::SetUseKeyboardCustomKeyType(bool enabled)
+{
+	switch (_mDevice)
+	{
+	case EChromaSDKDevice2DEnum::DE_Keyboard:
+		_mUseKeyboardCustomKeyType = enabled;
+		break;
+	}
+}
+
+bool Animation2D::HasKeyboardCustomKeyType()
+{
+	switch (_mDevice)
+	{
+	case EChromaSDKDevice2DEnum::DE_Keyboard:
+		return _mUseKeyboardCustomKeyType;
+	default:
+		return false;
+	}
 }

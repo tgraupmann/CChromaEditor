@@ -69,6 +69,7 @@ public:
 	afx_msg void OnBnClickedButtonImportAnimation();
 	afx_msg void OnBnClickedButtonImportOverrideTime();
 	afx_msg void OnBnClickedButtonSetDevice();
+	afx_msg void OnBnClickedCheckUseKeyboardKeyType();
 	afx_msg void OnBnClickedButtonClear();
 	afx_msg void OnBnClickedButtonFill();
 	afx_msg void OnBnClickedButtonRandom();
@@ -111,6 +112,7 @@ private:
 	CButton* GetControlSetLEDButton();
 	CStatic* GetControlFrames();
 	CEdit* GetControlDuration();
+	CButton* GetControlUseKeyboardCustomKeys();
 
 	void UpdateOverrideTime(float time);
 	float GetOverrideTime();

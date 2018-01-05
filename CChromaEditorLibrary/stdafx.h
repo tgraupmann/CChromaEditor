@@ -173,9 +173,13 @@ extern "C"
 	EXPORT_API void PluginCloseComposite(const char* name);
 	EXPORT_API double PluginCloseCompositeD(const char* name);
 
+	EXPORT_API int PluginSetUseKeyboardCustomKeyType(int animationId, bool enabled);
+	EXPORT_API int PluginSetUseKeyboardCustomKeyTypeName(const char* path, bool enabled);
+	EXPORT_API double PluginSetUseKeyboardCustomKeyTypeNameD(const char* path, double enabled);
+
 	EXPORT_API int PluginGetKeyColor(int animationId, int frameId, int rzkey);
 	EXPORT_API int PluginGetKeyColorName(const char* path, int frameId, int rzkey);
-	EXPORT_API double PluginGetKeyColorD(const char* path, double frameId, double rzkey);
+	EXPORT_API double PluginGetKeyColorNameD(const char* path, double frameId, double rzkey);
 
 	EXPORT_API int PluginGet1DColor(int animationId, int frameId, int led);
 	EXPORT_API int PluginGet1DColorName(const char* path, int frameId, int led);

@@ -1035,6 +1035,45 @@ FChromaSDKEffectResult ChromaSDKPlugin::CreateEffectCustom2D(const EChromaSDKDev
 	return data;
 }
 
+FChromaSDKEffectResult ChromaSDKPlugin::CreateEffectKeyboardCustomKey(const std::vector<FChromaSDKColors>& colors)
+{
+	FChromaSDKEffectResult data = FChromaSDKEffectResult();
+
+	RZRESULT result = 0;
+	RZEFFECTID effectId = RZEFFECTID();
+	int maxRow = Keyboard::MAX_ROW;
+	int maxColumn = Keyboard::MAX_COLUMN;
+	if (maxRow != colors.size() ||
+		(colors.size() > 0 &&
+			maxColumn != colors[0].Colors.size()))
+	{
+		LogError("ChromaSDKPlugin::CreateEffectCustomKeyboardKeys Array size mismatch row: %d==%d column: %d==%d!\r\n",
+			maxRow,
+			colors.size(),
+			maxColumn,
+			colors.size() > 0 ? colors[0].Colors.size() : 0);
+	}
+	else
+	{
+		Keyboard::CUSTOM_KEY_EFFECT_TYPE pParam = {};
+		for (int i = 0; i < maxRow; i++)
+		{
+			const FChromaSDKColors& row = colors[i];
+			for (int j = 0; j < maxColumn; j++)
+			{
+				pParam.Color[i][j] = row.Colors[j];
+				pParam.Key[i][j] = row.Colors[j];
+			}
+		}
+		result = ChromaSDKCreateKeyboardEffect(Keyboard::CHROMA_CUSTOM_KEY, &pParam, &effectId);
+	}
+	
+	data.EffectId.Data = effectId;
+	data.Result = result;
+
+	return data;
+}
+
 RZRESULT ChromaSDKPlugin::SetEffect(const FChromaSDKGuid& effectId)
 {
 	//LogDebug("ChromaSDKPlugin::SetEffect Invoke.\r\n");
@@ -1340,6 +1379,17 @@ AnimationBase* ChromaSDKPlugin::OpenAnimation(const string& path)
 								{
 									frames.push_back(frame);
 								}
+							}
+						}
+
+						if ((EChromaSDKDevice2DEnum)device == EChromaSDKDevice2DEnum::DE_Keyboard)
+						{
+							expectedSize = sizeof(int);
+							int flags = 0;
+							read = fread(&flags, expectedSize, 1, stream);
+							if (read == expectedRead)
+							{
+								animation2D->SetUseKeyboardCustomKeyType(flags == 1);
 							}
 						}
 					}
