@@ -1062,7 +1062,7 @@ FChromaSDKEffectResult ChromaSDKPlugin::CreateEffectKeyboardCustomKey(const std:
 			for (int j = 0; j < maxColumn; j++)
 			{
 				pParam.Color[i][j] = row.Colors[j];
-				pParam.Key[i][j] = row.Colors[j];
+				pParam.Key[i][j] = MAKEWORD(j, i);
 			}
 		}
 		result = ChromaSDKCreateKeyboardEffect(Keyboard::CHROMA_CUSTOM_KEY, &pParam, &effectId);
