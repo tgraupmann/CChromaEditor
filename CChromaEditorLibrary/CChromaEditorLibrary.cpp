@@ -1477,7 +1477,18 @@ void CMainViewDlg::OnBnClickedButtonPreview()
 			if (currentFrame < frames.size())
 			{
 				FChromaSDKColorFrame2D& frame = frames[currentFrame];
-				FChromaSDKEffectResult result = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(device, frame.Colors);
+				FChromaSDKEffectResult result;
+				AnimationBase* animation = GetAnimation();
+				Animation2D* animation2D = dynamic_cast<Animation2D*>(animation);
+				if (device == EChromaSDKDevice2DEnum::DE_Keyboard &&
+					animation2D->HasKeyboardCustomKeyType())
+				{
+					result = ChromaSDKPlugin::GetInstance()->CreateEffectKeyboardCustomKey(frame.Colors);
+				}
+				else
+				{
+					result = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(device, frame.Colors);
+				}
 				if (result.Result == 0)
 				{
 					ChromaSDKPlugin::GetInstance()->SetEffect(result.EffectId);
