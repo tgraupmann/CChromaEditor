@@ -1062,7 +1062,16 @@ extern "C"
 					}
 					FChromaSDKColorFrame2D frame = frames[frameIndex];
 					vector<FChromaSDKColors>& colors = frame.Colors;
-					FChromaSDKEffectResult result = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(animation2D->GetDevice(), colors);
+					FChromaSDKEffectResult result;
+					if (animation2D->GetDevice() == EChromaSDKDevice2DEnum::DE_Keyboard &&
+						animation2D->HasKeyboardCustomKeyType())
+					{
+						result = ChromaSDKPlugin::GetInstance()->CreateEffectKeyboardCustomKey(colors);
+					}
+					else
+					{
+						result = ChromaSDKPlugin::GetInstance()->CreateEffectCustom2D(animation2D->GetDevice(), colors);
+					}
 					if (result.Result == 0)
 					{
 						ChromaSDKPlugin::GetInstance()->SetEffect(result.EffectId);
