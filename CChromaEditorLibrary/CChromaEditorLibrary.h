@@ -100,6 +100,7 @@ private:
 	std::string _mPath;
 	bool _mPlayOnOpen;
 
+	CListBox* GetListTypes();
 	CEdit* GetControlOverrideTime();
 	CComboBox* GetControlDeviceType();
 	CComboBox* GetControlDevice();

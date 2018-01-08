@@ -526,8 +526,20 @@ void CMainViewDlg::RefreshFrames()
 	GetControlDuration()->SetWindowText(CString(bufferDuration));
 }
 
+CListBox* CMainViewDlg::GetListTypes()
+{
+	return (CListBox*)GetDlgItem(IDC_LIST_TYPES);
+}
+
 BOOL CMainViewDlg::OnInitDialog()
 {
+	GetListTypes()->AddString(_T("ChromaLink"));
+	GetListTypes()->AddString(_T("Headset"));
+	GetListTypes()->AddString(_T("Keyboard"));
+	GetListTypes()->AddString(_T("Keypad"));
+	GetListTypes()->AddString(_T("Mouse"));
+	GetListTypes()->AddString(_T("Mousepad"));
+
 	// Setup default
 	_mDeviceType = EChromaSDKDeviceTypeEnum::DE_2D;
 
