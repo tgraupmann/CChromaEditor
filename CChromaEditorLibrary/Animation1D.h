@@ -25,6 +25,7 @@ namespace ChromaSDK
 		void Stop();
 		void Update(float deltaTime);
 		void ResetFrames();
+		void SaveStream(FILE* stream);
 		int Save(const char* path);
 	private:
 		EChromaSDKDevice1DEnum _mDevice;

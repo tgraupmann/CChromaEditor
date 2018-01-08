@@ -265,6 +265,80 @@ void Animation1D::ResetFrames()
 	_mFrames.push_back(frame);
 }
 
+void Animation1D::SaveStream(FILE* stream)
+{
+	long write = 0;
+	long expectedWrite = 1;
+	long expectedSize = 0;
+
+	int version = ANIMATION_VERSION;
+	expectedSize = sizeof(int);
+	write = fwrite(&version, expectedSize, 1, stream);
+
+	//device type
+	byte deviceType = (byte)EChromaSDKDeviceTypeEnum::DE_1D;
+	expectedSize = sizeof(byte);
+	fwrite(&deviceType, expectedSize, 1, stream);
+
+	switch ((EChromaSDKDeviceTypeEnum)deviceType)
+	{
+	case EChromaSDKDeviceTypeEnum::DE_1D:
+		//LogDebug("Save: DeviceType: 1D\r\n");
+		break;
+	case EChromaSDKDeviceTypeEnum::DE_2D:
+		//LogDebug("Save: DeviceType: 2D\r\n");
+		break;
+	}
+
+	//device
+	byte device = (byte)_mDevice;
+	fwrite(&device, expectedSize, 1, stream);
+
+	switch ((EChromaSDKDevice1DEnum)device)
+	{
+	case EChromaSDKDevice1DEnum::DE_ChromaLink:
+		//LogDebug("Save: Device: DE_ChromaLink\r\n");
+		break;
+	case EChromaSDKDevice1DEnum::DE_Headset:
+		//LogDebug("Save: Device: DE_Headset\r\n");
+		break;
+	case EChromaSDKDevice1DEnum::DE_Mousepad:
+		//LogDebug("Save: Device: DE_Mousepad\r\n");
+		break;
+	}
+
+	//frame count
+	unsigned int frameCount = GetFrameCount();
+	expectedSize = sizeof(unsigned int);
+	fwrite(&frameCount, expectedSize, 1, stream);
+
+	//LogDebug("Save: FrameCount: %d\r\n", frameCount);
+
+	//frames
+	float duration = 0.0f;
+	COLORREF color = RGB(0, 0, 0);
+	for (unsigned int index = 0; index < frameCount; ++index)
+	{
+		//duration
+		float duration = GetDuration(index);
+		expectedSize = sizeof(float);
+		fwrite(&duration, expectedSize, 1, stream);
+
+		//colors
+		if (index < _mFrames.size())
+		{
+			FChromaSDKColorFrame1D& frame = _mFrames[index];
+			for (unsigned int i = 0; i < frame.Colors.size(); ++i)
+			{
+				//color
+				int color = (int)frame.Colors[i];
+				expectedSize = sizeof(int);
+				fwrite(&color, expectedSize, 1, stream);
+			}
+		}
+	}
+}
+
 int Animation1D::Save(const char* path)
 {
 	FILE* stream;
@@ -277,82 +351,7 @@ int Animation1D::Save(const char* path)
 	else if (0 == result &&
 		stream)
 	{
-		long write = 0;
-		long expectedWrite = 1;
-		long expectedSize = 0;
-
-		int version = ANIMATION_VERSION;
-		expectedSize = sizeof(int);
-		write = fwrite(&version, expectedSize, 1, stream);
-		if (expectedWrite != write)
-		{
-			fprintf(stderr, "Save: Failed to write version!\r\n");
-			std::fclose(stream);
-			return -1;
-		}
-
-		//device type
-		byte deviceType = (byte)EChromaSDKDeviceTypeEnum::DE_1D;
-		expectedSize = sizeof(byte);
-		fwrite(&deviceType, expectedSize, 1, stream);
-
-		switch ((EChromaSDKDeviceTypeEnum)deviceType)
-		{
-		case EChromaSDKDeviceTypeEnum::DE_1D:
-			LogDebug("Save: DeviceType: 1D\r\n");
-			break;
-		case EChromaSDKDeviceTypeEnum::DE_2D:
-			LogDebug("Save: DeviceType: 2D\r\n");
-			break;
-		}
-
-		//device
-		byte device = (byte)_mDevice;
-		fwrite(&device, expectedSize, 1, stream);
-
-		switch ((EChromaSDKDevice1DEnum)device)
-		{
-		case EChromaSDKDevice1DEnum::DE_ChromaLink:
-			LogDebug("Save: Device: DE_ChromaLink\r\n");
-			break;
-		case EChromaSDKDevice1DEnum::DE_Headset:
-			LogDebug("Save: Device: DE_Headset\r\n");
-			break;
-		case EChromaSDKDevice1DEnum::DE_Mousepad:
-			LogDebug("Save: Device: DE_Mousepad\r\n");
-			break;
-		}
-
-		//frame count
-		unsigned int frameCount = GetFrameCount();
-		expectedSize = sizeof(unsigned int);
-		fwrite(&frameCount, expectedSize, 1, stream);
-
-		LogDebug("Save: FrameCount: %d\r\n", frameCount);
-
-		//frames
-		float duration = 0.0f;
-		COLORREF color = RGB(0, 0, 0);
-		for (unsigned int index = 0; index < frameCount; ++index)
-		{
-			//duration
-			float duration = GetDuration(index);
-			expectedSize = sizeof(float);
-			fwrite(&duration, expectedSize, 1, stream);
-
-			//colors
-			if (index < _mFrames.size())
-			{
-				FChromaSDKColorFrame1D& frame = _mFrames[index];
-				for (unsigned int i = 0; i < frame.Colors.size(); ++i)
-				{
-					//color
-					int color = (int)frame.Colors[i];
-					expectedSize = sizeof(int);
-					fwrite(&color, expectedSize, 1, stream);
-				}
-			}
-		}
+		SaveStream(stream);
 
 		fflush(stream);
 		std::fclose(stream);

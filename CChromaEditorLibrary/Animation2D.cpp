@@ -274,6 +274,95 @@ void Animation2D::ResetFrames()
 	_mFrames.push_back(frame);
 }
 
+void Animation2D::SaveStream(FILE* stream)
+{
+	long write = 0;
+	long expectedWrite = 1;
+	long expectedSize = 0;
+
+	//version
+	int version = ANIMATION_VERSION;
+	expectedSize = sizeof(int);
+	write = fwrite(&version, expectedSize, 1, stream);
+
+	//device type
+	byte deviceType = (byte)EChromaSDKDeviceTypeEnum::DE_2D;
+	expectedSize = sizeof(byte);
+	fwrite(&deviceType, expectedSize, 1, stream);
+
+	switch ((EChromaSDKDeviceTypeEnum)deviceType)
+	{
+	case EChromaSDKDeviceTypeEnum::DE_1D:
+		//LogDebug("Save: DeviceType: 1D\r\n");
+		break;
+	case EChromaSDKDeviceTypeEnum::DE_2D:
+		//LogDebug("Save: DeviceType: 2D\r\n");
+		break;
+	}
+
+	//device
+	byte device = (byte)_mDevice;
+	fwrite(&device, expectedSize, 1, stream);
+
+	switch ((EChromaSDKDevice2DEnum)device)
+	{
+	case EChromaSDKDevice2DEnum::DE_Keyboard:
+		//LogDebug("Save: Device: DE_Keyboard\r\n");
+		break;
+	case EChromaSDKDevice2DEnum::DE_Keypad:
+		//LogDebug("Save: Device: DE_Keypad\r\n");
+		break;
+	case EChromaSDKDevice2DEnum::DE_Mouse:
+		//LogDebug("Save: Device: DE_Mouse\r\n");
+		break;
+	}
+
+	//frame count
+	unsigned int frameCount = _mFrames.size();
+	expectedSize = sizeof(unsigned int);
+	fwrite(&frameCount, expectedSize, 1, stream);
+
+	//LogDebug("Save: FrameCount: %d\r\n", frameCount);
+
+	//frames
+	COLORREF color = RGB(0, 0, 0);
+	for (unsigned int index = 0; index < frameCount; ++index)
+	{
+		//duration
+		float duration = GetDuration(index);
+		expectedSize = sizeof(float);
+		fwrite(&duration, expectedSize, 1, stream);
+
+		//colors
+		if (index < _mFrames.size())
+		{
+			FChromaSDKColorFrame2D& frame = _mFrames[index];
+			for (unsigned int i = 0; i < frame.Colors.size(); ++i)
+			{
+				FChromaSDKColors& row = frame.Colors[i];
+				for (unsigned int j = 0; j < row.Colors.size(); ++j)
+				{
+					//color
+					int color = row.Colors[j];
+					expectedSize = sizeof(int);
+					fwrite(&color, expectedSize, 1, stream);
+				}
+			}
+		}
+	}
+
+	if ((EChromaSDKDevice2DEnum)device == EChromaSDKDevice2DEnum::DE_Keyboard)
+	{
+		expectedSize = sizeof(int);
+		int flags = 0;
+		if (HasKeyboardCustomKeyType())
+		{
+			flags = 1;
+		}
+		fwrite(&flags, expectedSize, 1, stream);
+	}
+}
+
 int Animation2D::Save(const char* path)
 {
 	FILE* stream;
@@ -281,102 +370,13 @@ int Animation2D::Save(const char* path)
 	if (result == 13)
 	{
 		fprintf(stderr, "Save: Permission denied! %s\r\n", path);
-		return - 1;
+		return -1;
 	}
 	else if (0 == result &&
 		stream)
 	{
-		long write = 0;
-		long expectedWrite = 1;
-		long expectedSize = 0;
-
-		int version = ANIMATION_VERSION;
-		expectedSize = sizeof(int);
-		write = fwrite(&version, expectedSize, 1, stream);
-		if (expectedWrite != write)
-		{
-			fprintf(stderr, "Save: Failed to write version!\r\n");
-			std::fclose(stream);
-			return -1;
-		}
-
-		//device type
-		byte deviceType = (byte)EChromaSDKDeviceTypeEnum::DE_2D;
-		expectedSize = sizeof(byte);
-		fwrite(&deviceType, expectedSize, 1, stream);
-
-		switch ((EChromaSDKDeviceTypeEnum)deviceType)
-		{
-		case EChromaSDKDeviceTypeEnum::DE_1D:
-			LogDebug("Save: DeviceType: 1D\r\n");
-			break;
-		case EChromaSDKDeviceTypeEnum::DE_2D:
-			LogDebug("Save: DeviceType: 2D\r\n");
-			break;
-		}
-
-		//device
-		byte device = (byte)_mDevice;
-		fwrite(&device, expectedSize, 1, stream);
-
-		switch ((EChromaSDKDevice2DEnum)device)
-		{
-		case EChromaSDKDevice2DEnum::DE_Keyboard:
-			LogDebug("Save: Device: DE_Keyboard\r\n");
-			break;
-		case EChromaSDKDevice2DEnum::DE_Keypad:
-			LogDebug("Save: Device: DE_Keypad\r\n");
-			break;
-		case EChromaSDKDevice2DEnum::DE_Mouse:
-			LogDebug("Save: Device: DE_Mouse\r\n");
-			break;
-		}
-
-		//frame count
-		unsigned int frameCount = _mFrames.size();
-		expectedSize = sizeof(unsigned int);
-		fwrite(&frameCount, expectedSize, 1, stream);
-
-		LogDebug("Save: FrameCount: %d\r\n", frameCount);
-
-		//frames
-		COLORREF color = RGB(0, 0, 0);
-		for (unsigned int index = 0; index < frameCount; ++index)
-		{
-			//duration
-			float duration = GetDuration(index);
-			expectedSize = sizeof(float);
-			fwrite(&duration, expectedSize, 1, stream);
-
-			//colors
-			if (index < _mFrames.size())
-			{
-				FChromaSDKColorFrame2D& frame = _mFrames[index];
-				for (unsigned int i = 0; i < frame.Colors.size(); ++i)
-				{
-					FChromaSDKColors& row = frame.Colors[i];
-					for (unsigned int j = 0; j < row.Colors.size(); ++j)
-					{
-						//color
-						int color = row.Colors[j];
-						expectedSize = sizeof(int);
-						fwrite(&color, expectedSize, 1, stream);
-					}
-				}
-			}
-		}
-
-		if ((EChromaSDKDevice2DEnum)device == EChromaSDKDevice2DEnum::DE_Keyboard)
-		{
-			expectedSize = sizeof(int);
-			int flags = 0;
-			if (HasKeyboardCustomKeyType())
-			{
-				flags = 1;
-			}
-			fwrite(&flags, expectedSize, 1, stream);
-		}
-
+		SaveStream(stream);
+		
 		fflush(stream);
 		std::fclose(stream);
 
