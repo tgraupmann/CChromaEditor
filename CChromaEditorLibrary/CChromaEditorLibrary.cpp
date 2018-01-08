@@ -299,6 +299,62 @@ void CMainViewDlg::RefreshDevice()
 			GetControlUseKeyboardCustomKeys()->SetCheck(BST_UNCHECKED);
 		}
 	}
+
+	GetListTypes()->ResetContent();
+	
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_ChromaLink)
+	{
+		GetListTypes()->AddString(_T("[x] ChromaLink"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("ChromaLink"));
+	}
+
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_Headset)
+	{
+		GetListTypes()->AddString(_T("[x] Headset"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("Headset"));
+	}
+
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keyboard)
+	{
+		GetListTypes()->AddString(_T("[x] Keyboard"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("Keyboard"));
+	}
+
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keypad)
+	{
+		GetListTypes()->AddString(_T("[x] Keypad"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("Keypad"));
+	}
+
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Mouse)
+	{
+		GetListTypes()->AddString(_T("[x] Mouse"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("Mouse"));
+	}
+
+	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_Mousepad)
+	{
+		GetListTypes()->AddString(_T("[x] Mousepad"));
+	}
+	else
+	{
+		GetListTypes()->AddString(_T("Mousepad"));
+	}
 }
 
 void CMainViewDlg::RecreateGrid()
@@ -533,13 +589,6 @@ CListBox* CMainViewDlg::GetListTypes()
 
 BOOL CMainViewDlg::OnInitDialog()
 {
-	GetListTypes()->AddString(_T("ChromaLink"));
-	GetListTypes()->AddString(_T("Headset"));
-	GetListTypes()->AddString(_T("Keyboard"));
-	GetListTypes()->AddString(_T("Keypad"));
-	GetListTypes()->AddString(_T("Mouse"));
-	GetListTypes()->AddString(_T("Mousepad"));
-
 	// Setup default
 	_mDeviceType = EChromaSDKDeviceTypeEnum::DE_2D;
 
