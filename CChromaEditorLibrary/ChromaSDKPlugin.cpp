@@ -1106,6 +1106,38 @@ const char* ChromaSDKPlugin::GetMouseChar(EChromaSDKMouseLED led)
 	return _mMouseCharMap[led];
 }
 
+AnimationBase* ChromaSDKPlugin::CreateAnimationInMemory(int deviceType, int device)
+{
+	switch ((EChromaSDKDeviceTypeEnum)deviceType)
+	{
+		case EChromaSDKDeviceTypeEnum::DE_1D:
+			{
+				Animation1D* animation1D = new Animation1D();
+				animation1D->SetDevice((EChromaSDKDevice1DEnum)device);
+				vector<FChromaSDKColorFrame1D>& frames = animation1D->GetFrames();
+				frames.clear();
+				FChromaSDKColorFrame1D frame = FChromaSDKColorFrame1D();
+				frame.Colors = ChromaSDKPlugin::GetInstance()->CreateColors1D((EChromaSDKDevice1DEnum)device);
+				frames.push_back(frame);
+				return animation1D;
+			}
+			break;
+		case EChromaSDKDeviceTypeEnum::DE_2D:
+			{
+				Animation2D* animation2D = new Animation2D();
+				animation2D->SetDevice((EChromaSDKDevice2DEnum)device);
+				vector<FChromaSDKColorFrame2D>& frames = animation2D->GetFrames();
+				frames.clear();
+				FChromaSDKColorFrame2D frame = FChromaSDKColorFrame2D();
+				frame.Colors = ChromaSDKPlugin::GetInstance()->CreateColors2D((EChromaSDKDevice2DEnum)device);
+				frames.push_back(frame);
+				return animation2D;
+			}
+			break;
+	}
+	return nullptr;
+}
+
 AnimationBase* ChromaSDKPlugin::OpenAnimation(const string& path)
 {
 	AnimationBase* animation = nullptr;

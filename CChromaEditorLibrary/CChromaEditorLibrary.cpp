@@ -106,13 +106,15 @@ void CMainViewDlg::PlayAnimationOnOpen()
 
 void CMainViewDlg::LoadFile()
 {
+	AnimationBase* animation = nullptr;
 	if (_mPath.empty())
 	{
-		fprintf(stderr, "LoadFile: Path cannot be empty! Using `%s` instead.\r\n", TEMP_FILE);
-		_mPath = TEMP_FILE;
+		animation = ChromaSDKPlugin::GetInstance()->CreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
 	}
-
-	AnimationBase* animation = ChromaSDKPlugin::GetInstance()->OpenAnimation(_mPath);
+	else
+	{
+		animation = ChromaSDKPlugin::GetInstance()->OpenAnimation(_mPath);
+	}
 	if (animation)
 	{
 		Animation1D* animation1D;
@@ -143,7 +145,10 @@ void CMainViewDlg::LoadFile()
 
 void CMainViewDlg::SaveFile()
 {
-	GetAnimation()->Save(_mPath.c_str());
+	if (!_mPath.empty())
+	{
+		GetAnimation()->Save(_mPath.c_str());
+	}
 }
 
 CEdit* CMainViewDlg::GetControlOverrideTime()
