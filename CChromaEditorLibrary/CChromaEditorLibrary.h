@@ -149,4 +149,5 @@ private:
 	bool _mControlModifier;
 public:
 	afx_msg void OnBnClickedButtonLoop();
+	afx_msg void ListTypesOnSelChange();
 };

@@ -687,6 +687,90 @@ BOOL CMainViewDlg::OnInitDialog()
 	return TRUE;
 }
 
+void CMainViewDlg::ListTypesOnSelChange()
+{
+	// stop animation
+	OnBnClickedButtonStop();
+
+	EChromaSDKDeviceTypeEnum deviceType;
+	EChromaSDKDevice1DEnum device1D;
+	EChromaSDKDevice2DEnum device2D;
+
+	int index = GetListTypes()->GetCurSel();
+	switch (index)
+	{
+	case 0:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
+		device1D = EChromaSDKDevice1DEnum::DE_ChromaLink;
+		break;
+	case 1:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
+		device1D = EChromaSDKDevice1DEnum::DE_Headset;
+		break;
+	case 2:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
+		device2D = EChromaSDKDevice2DEnum::DE_Keyboard;
+		break;
+	case 3:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
+		device2D = EChromaSDKDevice2DEnum::DE_Keypad;
+		break;
+	case 4:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
+		device2D = EChromaSDKDevice2DEnum::DE_Mouse;
+		break;
+	case 5:
+		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
+		device1D = EChromaSDKDevice1DEnum::DE_Mousepad;
+		break;
+	default:
+		return;
+	}
+
+	bool changed = false;
+	if (_mDeviceType != deviceType)
+	{
+		_mDeviceType = deviceType;
+		changed = true;
+	}
+
+	switch (_mDeviceType)
+	{
+	case EChromaSDKDeviceTypeEnum::DE_1D:
+		if (_mEdit1D.GetDevice() != device1D)
+		{
+			_mEdit1D.SetDevice(device1D);
+			changed = true;
+		}
+		break;
+	case EChromaSDKDeviceTypeEnum::DE_2D:
+		if (_mEdit2D.GetDevice() != device2D)
+		{
+			_mEdit2D.SetDevice(device2D);
+			changed = true;
+		}
+		break;
+	}
+
+	if (changed)
+	{
+		// Save the file
+		SaveFile();
+
+		// Create the grid buttons
+		RecreateGrid();
+
+		// Display enums
+		RefreshDevice();
+
+		// Display grid
+		RefreshGrid();
+	}
+
+	//show changes
+	OnBnClickedButtonPreview();
+}
+
 BOOL CMainViewDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// check focus first
@@ -789,6 +873,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_COMMAND_RANGE(ID_DYNAMIC_BUTTON_MIN, ID_DYNAMIC_BUTTON_MAX, &CMainViewDlg::OnBnClickedButtonColor)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DEVICE_TYPE, &CMainViewDlg::OnBnClickedButtonSetDeviceType)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DURATION, &CMainViewDlg::OnBnClickedButtonSetDuration)
+	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::ListTypesOnSelChange)
 END_MESSAGE_MAP()
 
 vector<CColorButton*>& CMainViewDlg::GetGridButtons()
