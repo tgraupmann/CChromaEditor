@@ -305,60 +305,60 @@ void CMainViewDlg::RefreshDevice()
 		}
 	}
 
-	GetListTypes()->ResetContent();
+	GetControlListTypes()->ResetContent();
 	
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_ChromaLink)
 	{
-		GetListTypes()->AddString(_T("[x] ChromaLink"));
+		GetControlListTypes()->AddString(_T("[x] ChromaLink"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("ChromaLink"));
+		GetControlListTypes()->AddString(_T("ChromaLink"));
 	}
 
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_Headset)
 	{
-		GetListTypes()->AddString(_T("[x] Headset"));
+		GetControlListTypes()->AddString(_T("[x] Headset"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("Headset"));
+		GetControlListTypes()->AddString(_T("Headset"));
 	}
 
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keyboard)
 	{
-		GetListTypes()->AddString(_T("[x] Keyboard"));
+		GetControlListTypes()->AddString(_T("[x] Keyboard"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("Keyboard"));
+		GetControlListTypes()->AddString(_T("Keyboard"));
 	}
 
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Keypad)
 	{
-		GetListTypes()->AddString(_T("[x] Keypad"));
+		GetControlListTypes()->AddString(_T("[x] Keypad"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("Keypad"));
+		GetControlListTypes()->AddString(_T("Keypad"));
 	}
 
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_2D && _mEdit2D.GetDevice() == EChromaSDKDevice2DEnum::DE_Mouse)
 	{
-		GetListTypes()->AddString(_T("[x] Mouse"));
+		GetControlListTypes()->AddString(_T("[x] Mouse"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("Mouse"));
+		GetControlListTypes()->AddString(_T("Mouse"));
 	}
 
 	if (_mDeviceType == EChromaSDKDeviceTypeEnum::DE_1D && _mEdit1D.GetDevice() == EChromaSDKDevice1DEnum::DE_Mousepad)
 	{
-		GetListTypes()->AddString(_T("[x] Mousepad"));
+		GetControlListTypes()->AddString(_T("[x] Mousepad"));
 	}
 	else
 	{
-		GetListTypes()->AddString(_T("Mousepad"));
+		GetControlListTypes()->AddString(_T("Mousepad"));
 	}
 }
 
@@ -587,7 +587,12 @@ void CMainViewDlg::RefreshFrames()
 	GetControlDuration()->SetWindowText(CString(bufferDuration));
 }
 
-CListBox* CMainViewDlg::GetListTypes()
+CMenu* CMainViewDlg::GetControlMenu()
+{
+	return (CMenu*)GetDlgItem(IDR_MENU1);
+}
+
+CListBox* CMainViewDlg::GetControlListTypes()
 {
 	return (CListBox*)GetDlgItem(IDC_LIST_TYPES);
 }
@@ -701,7 +706,7 @@ void CMainViewDlg::ListTypesOnSelChange()
 	EChromaSDKDevice1DEnum device1D;
 	EChromaSDKDevice2DEnum device2D;
 
-	int index = GetListTypes()->GetCurSel();
+	int index = GetControlListTypes()->GetCurSel();
 	switch (index)
 	{
 	case 0:
@@ -879,6 +884,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DEVICE_TYPE, &CMainViewDlg::OnBnClickedButtonSetDeviceType)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DURATION, &CMainViewDlg::OnBnClickedButtonSetDuration)
 	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::ListTypesOnSelChange)
+	ON_BN_CLICKED(ID_MENU_EXIT, &CMainViewDlg::OnBnClickedMenuExit)
 END_MESSAGE_MAP()
 
 vector<CColorButton*>& CMainViewDlg::GetGridButtons()
@@ -1859,6 +1865,10 @@ void CMainViewDlg::OnBnClickedButtonReset()
 	OnBnClickedButtonPreview();
 }
 
+void CMainViewDlg::OnBnClickedMenuExit()
+{
+	PostQuitMessage(0);
+}
 
 void CMainViewDlg::OnBnClickedButtonSetDuration()
 {

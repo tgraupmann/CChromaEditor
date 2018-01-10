@@ -89,6 +89,7 @@ public:
 	afx_msg void OnBnClickedButtonReset();
 	afx_msg void OnBnClickedButtonSetDeviceType();
 	afx_msg void OnBnClickedButtonSetDuration();
+	afx_msg void OnBnClickedMenuExit();
 
 	void OnBnClickedButtonColor(UINT nID);
 
@@ -100,7 +101,8 @@ private:
 	std::string _mPath;
 	bool _mPlayOnOpen;
 
-	CListBox* GetListTypes();
+	CMenu* GetControlMenu();
+	CListBox* GetControlListTypes();
 	CEdit* GetControlOverrideTime();
 	CComboBox* GetControlDeviceType();
 	CComboBox* GetControlDevice();
