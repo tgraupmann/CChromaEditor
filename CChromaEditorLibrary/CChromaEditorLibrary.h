@@ -89,6 +89,9 @@ public:
 	afx_msg void OnBnClickedButtonReset();
 	afx_msg void OnBnClickedButtonSetDeviceType();
 	afx_msg void OnBnClickedButtonSetDuration();
+	afx_msg void OnBnClickedMenuReset();
+	afx_msg void OnBnClickedMenuSave();
+	afx_msg void OnBnClickedMenuSaveAs();
 	afx_msg void OnBnClickedMenuExit();
 
 	void OnBnClickedButtonColor(UINT nID);
