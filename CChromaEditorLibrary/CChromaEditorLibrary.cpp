@@ -884,7 +884,8 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DEVICE_TYPE, &CMainViewDlg::OnBnClickedButtonSetDeviceType)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DURATION, &CMainViewDlg::OnBnClickedButtonSetDuration)
 	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::ListTypesOnSelChange)
-	ON_BN_CLICKED(ID_MENU_RESET, &CMainViewDlg::OnBnClickedMenuReset)
+	ON_BN_CLICKED(ID_MENU_NEW, &CMainViewDlg::OnBnClickedMenuNew)
+	ON_BN_CLICKED(ID_MENU_OPEN, &CMainViewDlg::OnBnClickedMenuOpen)
 	ON_BN_CLICKED(ID_MENU_SAVE, &CMainViewDlg::OnBnClickedMenuSave)
 	ON_BN_CLICKED(ID_MENU_SAVE_AS, &CMainViewDlg::OnBnClickedMenuSaveAs)
 	ON_BN_CLICKED(ID_MENU_EXIT, &CMainViewDlg::OnBnClickedMenuExit)
@@ -1916,12 +1917,18 @@ void CMainViewDlg::OnBnClickedButtonSetDuration()
 	OnBnClickedButtonPreview();
 }
 
-void CMainViewDlg::OnBnClickedMenuReset()
+void CMainViewDlg::OnBnClickedMenuNew()
 {
 	// stop animation
 	OnBnClickedButtonStop();
 
 	OnBnClickedButtonReset();
+}
+
+void CMainViewDlg::OnBnClickedMenuOpen()
+{
+	// stop animation
+	OnBnClickedButtonStop();
 }
 
 void CMainViewDlg::OnBnClickedMenuSave()
