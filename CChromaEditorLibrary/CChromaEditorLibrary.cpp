@@ -1929,6 +1929,50 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 {
 	// stop animation
 	OnBnClickedButtonStop();
+
+	// get path from loaded filename
+	CString szDir;
+	size_t lastSlash = _mPath.find_last_of("/\\");
+	if (lastSlash < 0)
+	{
+		return;
+	}
+	string path = _mPath.substr(0, lastSlash);
+	//LogDebug("ImportTextureAnimation path=%s", path.c_str());
+	szDir += path.c_str();
+
+	const int MAX_CFileDialog_FILE_COUNT = 99;
+	const int FILE_LIST_BUFFER_SIZE = ((MAX_CFileDialog_FILE_COUNT * (MAX_PATH + 1)) + 1);
+
+	CString fileName;
+	wchar_t* p = fileName.GetBuffer(FILE_LIST_BUFFER_SIZE);
+	CFileDialog dlgFile(TRUE);
+	OPENFILENAME& ofn = dlgFile.GetOFN();
+	ofn.lpstrFilter = _TEXT("Animation\0*.chroma\0");
+	ofn.lpstrInitialDir = szDir;
+	ofn.lpstrFile = p;
+	ofn.nMaxFile = FILE_LIST_BUFFER_SIZE;
+
+	if (dlgFile.DoModal() == IDOK)
+	{
+		_mPath = string(CT2CA(fileName));
+		if (_mPath.size() <= 2 ||
+			_mPath.substr(_mPath.find_last_of(".") + 1) != "chroma")
+		{
+			_mPath += ".chroma";
+		}
+		LoadFile();
+
+		// Create the grid buttons
+		RecreateGrid();
+
+		// Display enums
+		RefreshDevice();
+
+		// Display grid
+		RefreshGrid();
+	}
+	fileName.ReleaseBuffer();
 }
 
 void CMainViewDlg::OnBnClickedMenuSave()
