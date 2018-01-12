@@ -5,17 +5,21 @@
 class EditorAnimationBase
 {
 public:
-	virtual ChromaSDK::AnimationBase* GetAnimation() = 0;
+	virtual ChromaSDK::AnimationBase* GetAnimation();
+	virtual void SetAnimation(ChromaSDK::AnimationBase* animation);
 	int GetCurrentFrame();
 	void SetCurrentFrame(unsigned int index);
 	unsigned int GetFrameCount();
 	virtual float GetDuration(unsigned int index) = 0;
+	virtual void OverrideTime(float time) = 0;
 	void ImportTextureImage();
 	void ImportTextureAnimation();
 	void ReadImage(const std::string& texturePath, bool isAnimation);
 	virtual void CopyPixels(COLORREF* pColor, UINT width, UINT height) = 0;
 	virtual void AddFrame() = 0;
 	void SetPath(const std::string& path);
+	virtual void Reset() = 0;
 private:
 	std::string _mPath;
+	ChromaSDK::AnimationBase* _mAnimation;
 };

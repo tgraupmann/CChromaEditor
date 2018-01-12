@@ -68,7 +68,6 @@ public:
 	afx_msg void OnBnClickedButtonImportImage();
 	afx_msg void OnBnClickedButtonImportAnimation();
 	afx_msg void OnBnClickedButtonImportOverrideTime();
-	afx_msg void OnBnClickedButtonSetDevice();
 	afx_msg void OnBnClickedCheckUseKeyboardKeyType();
 	afx_msg void OnBnClickedButtonClear();
 	afx_msg void OnBnClickedButtonFill();
@@ -87,7 +86,6 @@ public:
 	afx_msg void OnBnClickedButtonAdd();
 	afx_msg void OnBnClickedButtonDelete();
 	afx_msg void OnBnClickedButtonReset();
-	afx_msg void OnBnClickedButtonSetDeviceType();
 	afx_msg void OnBnClickedButtonSetDuration();
 	afx_msg void OnBnClickedMenuNew();
 	afx_msg void OnBnClickedMenuOpen();
@@ -99,8 +97,21 @@ public:
 
 private:
 
+	EChromaSDKDeviceTypeEnum GetDeviceType();
+	void SetDeviceType(AnimationBase* animation);
+
 	EditorAnimationBase* GetEditor();
+	EditorAnimation1D* GetEditor1D();
+	EditorAnimation2D* GetEditor2D();
 	AnimationBase* GetAnimation();
+	Animation1D* GetAnimation1D();
+	Animation2D* GetAnimation2D();
+
+	bool GetDimensions1D(int& maxLeds);
+	bool GetDimensions2D(int& maxRow, int& maxColumn);
+
+	bool GetCurrentFrame1D(FChromaSDKColorFrame1D& frame);
+	bool GetCurrentFrame2D(FChromaSDKColorFrame2D& frame);
 
 	std::string _mPath;
 	bool _mPlayOnOpen;
@@ -108,8 +119,6 @@ private:
 	CMenu* GetControlMenu();
 	CListBox* GetControlListTypes();
 	CEdit* GetControlOverrideTime();
-	CComboBox* GetControlDeviceType();
-	CComboBox* GetControlDevice();
 	CStatic* GetControlGridSize();
 	CStatic* GetControlSetKeyLabel();
 	CComboBox* GetControlSetKeyCombo();
@@ -141,15 +150,19 @@ private:
 
 	float _mOverrideTime;
 
-	EChromaSDKDeviceTypeEnum _mDeviceType;
+	EChromaSDKDeviceEnum _mDevice;
 
 	std::vector<CColorButton*> _mGridButtons;
 	std::vector<CColorButton*> _mColorButtons;
 	COLORREF _mColor;
 
 	// editors
-	ChromaSDK::EditorAnimation1D _mEdit1D;
-	ChromaSDK::EditorAnimation2D _mEdit2D;
+	ChromaSDK::EditorAnimation1D _mEditChromaLink;
+	ChromaSDK::EditorAnimation1D _mEditHeadset;
+	ChromaSDK::EditorAnimation2D _mEditKeyboard;
+	ChromaSDK::EditorAnimation2D _mEditKeypad;
+	ChromaSDK::EditorAnimation2D _mEditMouse;
+	ChromaSDK::EditorAnimation1D _mEditMousepad;
 
 	// keyboard input
 	bool _mControlModifier;

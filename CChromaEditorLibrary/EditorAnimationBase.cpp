@@ -2,7 +2,18 @@
 #include "EditorAnimationBase.h"
 #include "direct.h"
 
+using namespace ChromaSDK;
 using namespace std;
+
+AnimationBase* EditorAnimationBase::GetAnimation()
+{
+	return _mAnimation;
+}
+
+void EditorAnimationBase::SetAnimation(AnimationBase* animation)
+{
+	_mAnimation = animation;
+}
 
 int EditorAnimationBase::GetCurrentFrame()
 {

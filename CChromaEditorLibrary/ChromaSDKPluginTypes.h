@@ -30,6 +30,16 @@ namespace ChromaSDK
 		DE_2D,
 	};
 
+	enum EChromaSDKDeviceEnum
+	{
+		EDIT_ChromaLink = 0,
+		EDIT_Keyboard,
+		EDIT_Keypad,
+		EDIT_Mouse,
+		EDIT_Headset,
+		EDIT_Mousepad,
+	};
+
 	enum EChromaSDKDevice1DEnum
 	{
 		DE_ChromaLink = 0,
