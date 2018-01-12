@@ -110,6 +110,17 @@ private:
 	bool GetDimensions1D(int& maxLeds);
 	bool GetDimensions2D(int& maxRow, int& maxColumn);
 
+	int GetCurrentFrame();
+	void SetCurrentFrame(unsigned int index);
+	int GetFrameCount();
+	void OverrideTime(float time);
+	void AddFrame();
+	void SetPath(const std::string& path);
+	void SetAnimation(AnimationBase* animation);
+	void Reset();
+	std::vector<COLORREF> CreateColors1D();
+	std::vector<FChromaSDKColors> CreateColors2D();
+
 	bool GetCurrentFrame1D(FChromaSDKColorFrame1D& frame);
 	bool GetCurrentFrame2D(FChromaSDKColorFrame2D& frame);
 

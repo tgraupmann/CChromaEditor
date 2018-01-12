@@ -348,7 +348,7 @@ void EditorAnimationBase::ReadImage(const std::string& texturePath, bool isAnima
 	}
 }
 
-void EditorAnimationBase::SetPath(const std::string& path)
+void EditorAnimationBase::SetPath(const string& path)
 {
 	_mPath = path;
 }

@@ -149,9 +149,9 @@ void CMainViewDlg::LoadFile()
 	if (animation != nullptr)
 	{
 		SetDeviceType(animation);
-		GetEditor()->SetPath(_mPath);
-		GetEditor()->SetAnimation(animation);
-		GetEditor()->Reset();
+		SetPath(_mPath);
+		SetAnimation(animation);
+		Reset();
 	}
 }
 
@@ -417,18 +417,20 @@ void CMainViewDlg::RefreshGrid()
 {
 	// update grid label
 	char buffer[20] = { 0 };
+	int maxLeds;
+	int maxRow;
+	int maxColumn;
 	switch (GetDeviceType())
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
+		if (GetDimensions1D(maxLeds))
 		{
-			int maxLeds = ChromaSDKPlugin::GetInstance()->GetMaxLeds(GetEditor1D()->GetDevice());
 			sprintf_s(buffer, "1 x %d", maxLeds);
 		}
 		break;
 	case EChromaSDKDeviceTypeEnum::DE_2D:
+		if (GetDimensions2D(maxRow, maxColumn))
 		{
-			int maxRow = ChromaSDKPlugin::GetInstance()->GetMaxRow(GetEditor2D()->GetDevice());
-			int maxColumn = ChromaSDKPlugin::GetInstance()->GetMaxColumn(GetEditor2D()->GetDevice());
 			sprintf_s(buffer, "%d x %d", maxRow, maxColumn);
 		}
 		break;
@@ -439,14 +441,12 @@ void CMainViewDlg::RefreshGrid()
 	// update buttons
 	vector<CColorButton*>& buttons = GetGridButtons();
 
-	unsigned int currentFrame = GetEditor()->GetCurrentFrame();
+	int currentFrame = GetCurrentFrame();
 
 	switch (GetDeviceType())
 	{
 	case EChromaSDKDeviceTypeEnum::DE_1D:
 		{
-			int maxLeds = ChromaSDKPlugin::GetInstance()->GetMaxLeds(GetEditor1D()->GetDevice());
-			EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
 			vector<FChromaSDKColorFrame1D>& frames = GetEditor1D()->GetFrames();
 			if (currentFrame < 0 ||
 				currentFrame >= frames.size())
@@ -473,9 +473,6 @@ void CMainViewDlg::RefreshGrid()
 		break;
 	case EChromaSDKDeviceTypeEnum::DE_2D:
 		{
-			int maxRow = ChromaSDKPlugin::GetInstance()->GetMaxRow(GetEditor2D()->GetDevice());
-			int maxColumn = ChromaSDKPlugin::GetInstance()->GetMaxColumn(GetEditor2D()->GetDevice());
-			EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
 			vector<FChromaSDKColorFrame2D>& frames = GetEditor2D()->GetFrames();
 			if (currentFrame < 0 ||
 				currentFrame >= frames.size())
@@ -511,8 +508,8 @@ void CMainViewDlg::RefreshFrames()
 {
 	//update frames label
 	char bufferFrameInfo[48] = { 0 };
-	int currentFrame = GetEditor()->GetCurrentFrame();
-	int frameCount = GetEditor()->GetFrameCount();
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
 
 	sprintf_s(bufferFrameInfo, "%d of %d", currentFrame + 1, frameCount);
 	GetControlFrames()->SetWindowText(CString(bufferFrameInfo));
@@ -882,14 +879,16 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 				button->SetColor(color, color);
 				button->Invalidate();
 
-				int currentFrame = GetEditor()->GetCurrentFrame();
+				int currentFrame = GetCurrentFrame();
+				int maxLeds;
+				int maxRow;
+				int maxColumn;
 
 				switch (GetDeviceType())
 				{
 				case EChromaSDKDeviceTypeEnum::DE_1D:
+					if (GetDimensions1D(maxLeds))
 					{
-						EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
-						int maxLeds = ChromaSDKPlugin::GetInstance()->GetMaxLeds(device);
 						vector<FChromaSDKColorFrame1D>& frames = GetEditor1D()->GetFrames();
 						if (currentFrame < 0 ||
 							currentFrame >= frames.size())
@@ -906,10 +905,8 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 					}
 					break;
 				case EChromaSDKDeviceTypeEnum::DE_2D:
+					if (GetDimensions2D(maxRow, maxColumn))
 					{
-						EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
-						int maxRow = ChromaSDKPlugin::GetInstance()->GetMaxRow(device);
-						int maxColumn = ChromaSDKPlugin::GetInstance()->GetMaxColumn(device);
 						vector<FChromaSDKColorFrame2D>& frames = GetEditor2D()->GetFrames();
 						if (currentFrame < 0 ||
 							currentFrame >= frames.size())
@@ -1009,7 +1006,7 @@ void CMainViewDlg::OnBnClickedButtonImportOverrideTime()
 
 	float time = GetOverrideTime();
 	_mOverrideTime = time;
-	GetEditor()->OverrideTime(time);
+	OverrideTime(time);
 	RefreshFrames();
 	SaveFile();
 
@@ -1084,10 +1081,62 @@ bool CMainViewDlg::GetDimensions2D(int& maxRow, int& maxColumn)
 	}
 }
 
+int CMainViewDlg::GetCurrentFrame()
+{
+	return GetEditor()->GetCurrentFrame();
+}
+
+void CMainViewDlg::SetCurrentFrame(unsigned int index)
+{
+	GetEditor()->SetCurrentFrame(index);
+}
+
+int CMainViewDlg::GetFrameCount()
+{
+	return GetEditor()->GetFrameCount();
+}
+
+void CMainViewDlg::OverrideTime(float time)
+{
+	GetEditor()->OverrideTime(time);
+}
+
+void CMainViewDlg::AddFrame()
+{
+	GetEditor()->AddFrame();
+}
+
+void CMainViewDlg::SetPath(const std::string& path)
+{
+	GetEditor()->SetPath(path);
+}
+
+void CMainViewDlg::SetAnimation(AnimationBase* animation)
+{
+	GetEditor()->SetAnimation(animation);
+}
+
+void CMainViewDlg::Reset()
+{
+	GetEditor()->Reset();
+}
+
+vector<COLORREF> CMainViewDlg::CreateColors1D()
+{
+	EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
+	return ChromaSDKPlugin::GetInstance()->CreateColors1D(device);
+}
+
+vector<FChromaSDKColors> CMainViewDlg::CreateColors2D()
+{
+	EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
+	return ChromaSDKPlugin::GetInstance()->CreateColors2D(device);
+}
+
 bool CMainViewDlg::GetCurrentFrame1D(FChromaSDKColorFrame1D& frame)
 {
-	int currentFrame = GetEditor()->GetCurrentFrame();
-	int frameCount = GetEditor()->GetFrameCount();
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
 	if (currentFrame < 0 ||
 		currentFrame >= frameCount)
 	{
@@ -1096,7 +1145,6 @@ bool CMainViewDlg::GetCurrentFrame1D(FChromaSDKColorFrame1D& frame)
 	if (currentFrame < frameCount &&
 		GetDeviceType() == EChromaSDKDeviceTypeEnum::DE_1D)
 	{
-		EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
 		vector<FChromaSDKColorFrame1D>& frames = GetEditor1D()->GetFrames();
 		frame = frames[currentFrame];
 		return true;
@@ -1106,8 +1154,8 @@ bool CMainViewDlg::GetCurrentFrame1D(FChromaSDKColorFrame1D& frame)
 
 bool CMainViewDlg::GetCurrentFrame2D(FChromaSDKColorFrame2D& frame)
 {
-	int currentFrame = GetEditor()->GetCurrentFrame();
-	int frameCount = GetEditor()->GetFrameCount();
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
 	if (currentFrame < 0 ||
 		currentFrame >= frameCount)
 	{
@@ -1116,7 +1164,6 @@ bool CMainViewDlg::GetCurrentFrame2D(FChromaSDKColorFrame2D& frame)
 	if (currentFrame < frameCount &&
 		GetDeviceType() == EChromaSDKDeviceTypeEnum::DE_2D)
 	{
-		EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
 		vector<FChromaSDKColorFrame2D>& frames = GetEditor2D()->GetFrames();
 		frame = frames[currentFrame];
 		return true;
@@ -1137,15 +1184,13 @@ void CMainViewDlg::OnBnClickedButtonClear()
 	case EChromaSDKDeviceTypeEnum::DE_1D:
 		if (GetCurrentFrame1D(frame1D))
 		{
-			EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
-			frame1D.Colors = ChromaSDKPlugin::GetInstance()->CreateColors1D(device);
+			frame1D.Colors = CreateColors1D();
 		}
 		break;
 	case EChromaSDKDeviceTypeEnum::DE_2D:
 		if (GetCurrentFrame2D(frame2D))
 		{
-			EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
-			frame2D.Colors = ChromaSDKPlugin::GetInstance()->CreateColors2D(device);
+			frame2D.Colors = CreateColors2D();
 		}
 		break;
 	}
@@ -1267,8 +1312,8 @@ void CMainViewDlg::OnBnClickedButtonPaste()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	int currentFrame = GetEditor()->GetCurrentFrame();
-	int frameCount = GetEditor()->GetFrameCount();
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
 	if (currentFrame < 0 ||
 		currentFrame >= frameCount)
 	{
@@ -1512,9 +1557,9 @@ void CMainViewDlg::OnBnClickedButtonPrevious()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	int currentFrame = GetEditor()->GetCurrentFrame();
+	int currentFrame = GetCurrentFrame();
 	if (currentFrame < 1 ||
-		currentFrame >= GetEditor()->GetFrameCount())
+		currentFrame >= GetFrameCount())
 	{
 		currentFrame = 0;
 	}
@@ -1522,7 +1567,7 @@ void CMainViewDlg::OnBnClickedButtonPrevious()
 	{
 		--currentFrame;
 	}
-	GetEditor()->SetCurrentFrame(currentFrame);
+	SetCurrentFrame(currentFrame);
 	RefreshGrid();
 	RefreshFrames();
 
@@ -1536,17 +1581,17 @@ void CMainViewDlg::OnBnClickedButtonNext()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	int currentFrame = GetEditor()->GetCurrentFrame();
+	int currentFrame = GetCurrentFrame();
 	if (currentFrame < 0 ||
-		currentFrame >= GetEditor()->GetFrameCount())
+		currentFrame >= GetFrameCount())
 	{
 		currentFrame = 0;
 	}
-	if ((currentFrame + 1) < GetEditor()->GetFrameCount())
+	if ((currentFrame + 1) < GetFrameCount())
 	{
 		++currentFrame;
 	}
-	GetEditor()->SetCurrentFrame(currentFrame);
+	SetCurrentFrame(currentFrame);
 	RefreshGrid();
 	RefreshFrames();
 
@@ -1560,7 +1605,7 @@ void CMainViewDlg::OnBnClickedButtonAdd()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	GetEditor()->AddFrame();
+	AddFrame();
 	RefreshGrid();
 	RefreshFrames();
 	SaveFile();
@@ -1575,9 +1620,9 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	int currentFrame = GetEditor()->GetCurrentFrame();
+	int currentFrame = GetCurrentFrame();
 	if (currentFrame < 0 ||
-		currentFrame >= GetEditor()->GetFrameCount())
+		currentFrame >= GetFrameCount())
 	{
 		currentFrame = 0;
 	}
@@ -1590,7 +1635,7 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 			if (frames.size() == 1)
 			{
 				FChromaSDKColorFrame1D frame = FChromaSDKColorFrame1D();
-				frame.Colors = ChromaSDKPlugin::GetInstance()->CreateColors1D(GetEditor1D()->GetDevice());
+				frame.Colors = CreateColors1D();
 				frames[0] = frame;
 			}
 			else if (frames.size() > 0)
@@ -1600,7 +1645,7 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 				if (currentFrame == frames.size())
 				{
 					currentFrame = frames.size() - 1;
-					GetEditor()->SetCurrentFrame(currentFrame);
+					SetCurrentFrame(currentFrame);
 				}
 			}
 		}
@@ -1611,7 +1656,7 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 			if (frames.size() == 1)
 			{
 				FChromaSDKColorFrame2D frame = FChromaSDKColorFrame2D();
-				frame.Colors = ChromaSDKPlugin::GetInstance()->CreateColors2D(GetEditor2D()->GetDevice());
+				frame.Colors = CreateColors2D();
 				frames[0] = frame;
 			}
 			else if (frames.size() > 0)
@@ -1621,7 +1666,7 @@ void CMainViewDlg::OnBnClickedButtonDelete()
 				if (currentFrame == frames.size())
 				{
 					currentFrame = frames.size() - 1;
-					GetEditor()->SetCurrentFrame(currentFrame);
+					SetCurrentFrame(currentFrame);
 				}
 			}
 		}
@@ -1659,13 +1704,13 @@ void CMainViewDlg::OnBnClickedButtonSetDuration()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	unsigned int currentFrame = GetEditor()->GetCurrentFrame();
+	unsigned int currentFrame = GetCurrentFrame();
 	if (currentFrame < 0 ||
-		currentFrame >= GetEditor()->GetFrameCount())
+		currentFrame >= GetFrameCount())
 	{
 		currentFrame = 0;
 	}
-	if (currentFrame < GetEditor()->GetFrameCount())
+	if (currentFrame < GetFrameCount())
 	{
 		switch (GetDeviceType())
 		{
