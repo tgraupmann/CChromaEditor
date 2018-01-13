@@ -352,3 +352,12 @@ void EditorAnimationBase::SetPath(const string& path)
 {
 	_mPath = path;
 }
+
+void EditorAnimationBase::Stop()
+{
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+	GetAnimation()->Stop();
+}

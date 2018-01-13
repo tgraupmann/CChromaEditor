@@ -82,12 +82,12 @@ CMainViewDlg::CMainViewDlg() : CDialogEx(IDD_MAIN_VIEW)
 
 CMainViewDlg::~CMainViewDlg()
 {
-	_mEditChromaLink.GetAnimation()->Stop();
-	_mEditHeadset.GetAnimation()->Stop();
-	_mEditKeyboard.GetAnimation()->Stop();
-	_mEditKeypad.GetAnimation()->Stop();
-	_mEditMouse.GetAnimation()->Stop();
-	_mEditMousepad.GetAnimation()->Stop();
+	_mEditChromaLink.Stop();
+	_mEditHeadset.Stop();
+	_mEditKeyboard.Stop();
+	_mEditKeypad.Stop();
+	_mEditMouse.Stop();
+	_mEditMousepad.Stop();
 }
 
 void CMainViewDlg::OpenOrCreateAnimation(const std::string& path)
@@ -299,7 +299,7 @@ void CMainViewDlg::RefreshDevice()
 	GetControlSetLEDCombo()->ShowWindow(show);
 	GetControlSetLEDButton()->ShowWindow(show);
 
-	show = _mDevice == EChromaSDKDeviceEnum::EDIT_Keyboard;
+	show = _mDevice == EChromaSDKDeviceEnum::EDIT_Keyboard && GetAnimation() != nullptr;
 	GetControlUseKeyboardCustomKeys()->ShowWindow(show);
 	if (show)
 	{
@@ -397,6 +397,11 @@ void CMainViewDlg::RecreateGrid()
 	}
 	buttons.clear();
 
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+
 	COLORREF black = RGB(0, 0, 0);
 
 	// update grid label
@@ -453,6 +458,11 @@ void CMainViewDlg::RecreateGrid()
 
 void CMainViewDlg::RefreshGrid()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+
 	// update grid label
 	char buffer[20] = { 0 };
 	int maxLeds;
@@ -1390,6 +1400,11 @@ void CMainViewDlg::OnBnClickedButtonPaste()
 
 void CMainViewDlg::OnBnClickedButtonPreview()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+
 	FChromaSDKColorFrame1D frame1D;
 	FChromaSDKColorFrame2D frame2D;
 
@@ -1508,8 +1523,49 @@ void CMainViewDlg::OnBnClickedButtonPlay()
 
 void CMainViewDlg::OnBnClickedButtonEnable()
 {
+	int index = GetControlListTypes()->GetCurSel();
+
 	AnimationBase* animation = GetAnimation();
-	if (animation != nullptr)
+	if (animation == nullptr)
+	{
+		int animationId;
+
+		switch (_mDevice)
+		{
+		case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditChromaLink)->SetAnimation(animation);
+			break;
+		case EChromaSDKDeviceEnum::EDIT_Headset:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditHeadset)->SetAnimation(animation);
+			break;
+		case EChromaSDKDeviceEnum::EDIT_Keyboard:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditKeyboard)->SetAnimation(animation);
+			break;
+		case EChromaSDKDeviceEnum::EDIT_Keypad:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditKeypad)->SetAnimation(animation);
+			break;
+		case EChromaSDKDeviceEnum::EDIT_Mouse:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditMouse)->SetAnimation(animation);
+			break;
+		case EChromaSDKDeviceEnum::EDIT_Mousepad:
+			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
+			animation = GetAnimationInstance(animationId);
+			((EditorAnimationBase*)&_mEditMousepad)->SetAnimation(animation);
+			break;
+		}
+		GetEditor()->SetAnimation(animation);
+	}
+	else
 	{
 		int animationId = PluginGetAnimationIdFromInstance(animation);
 		if (animationId >= 0)
@@ -1518,8 +1574,8 @@ void CMainViewDlg::OnBnClickedButtonEnable()
 			PluginUnloadAnimation(animationId);
 			PluginCloseAnimation(animationId);
 		}
+		GetEditor()->SetAnimation(nullptr);
 	}
-	GetEditor()->SetAnimation(nullptr);
 
 	// Create the grid buttons
 	RecreateGrid();
@@ -1529,6 +1585,9 @@ void CMainViewDlg::OnBnClickedButtonEnable()
 
 	// Display grid
 	RefreshGrid();
+
+	GetControlListTypes()->SetCurSel(index);
+	GetControlListTypes()->SetFocus();
 }
 
 void CMainViewDlg::OnBnClickedButtonLoop()
@@ -1541,12 +1600,8 @@ void CMainViewDlg::OnBnClickedButtonLoop()
 
 void CMainViewDlg::OnBnClickedButtonStop()
 {
-	if (GetAnimation() != nullptr)
-	{
-		GetAnimation()->Stop();
-	}
+	GetEditor()->Stop();
 }
-
 
 void CMainViewDlg::OnBnClickedButtonLoad()
 {

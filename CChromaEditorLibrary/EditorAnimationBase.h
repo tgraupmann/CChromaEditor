@@ -19,6 +19,7 @@ public:
 	virtual void AddFrame() = 0;
 	void SetPath(const std::string& path);
 	virtual void Reset() = 0;
+	virtual void Stop();
 private:
 	std::string _mPath;
 	ChromaSDK::AnimationBase* _mAnimation;
