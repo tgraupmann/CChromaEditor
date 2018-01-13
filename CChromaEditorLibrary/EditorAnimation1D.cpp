@@ -7,27 +7,21 @@ using namespace std;
 
 EditorAnimation1D::EditorAnimation1D()
 {
-	Reset();
 }
 
-AnimationBase* EditorAnimation1D::GetAnimation()
+Animation1D* EditorAnimation1D::GetAnimation1D()
 {
-	return &_mAnimation;
-}
-
-void EditorAnimation1D::SetAnimation(Animation1D& animation)
-{
-	_mAnimation = animation;
+	return (Animation1D*)GetAnimation();
 }
 
 EChromaSDKDevice1DEnum EditorAnimation1D::GetDevice()
 {
-	return _mAnimation.GetDevice();
+	return GetAnimation1D()->GetDevice();
 }
 
 bool EditorAnimation1D::SetDevice(EChromaSDKDevice1DEnum device)
 {
-	if (_mAnimation.SetDevice(device))
+	if (GetAnimation1D()->SetDevice(device))
 	{
 		Reset();
 		return true;
@@ -40,7 +34,7 @@ bool EditorAnimation1D::SetDevice(EChromaSDKDevice1DEnum device)
 
 vector<FChromaSDKColorFrame1D>& EditorAnimation1D::GetFrames()
 {
-	return _mAnimation.GetFrames();
+	return GetAnimation1D()->GetFrames();
 }
 
 void EditorAnimation1D::Reset()

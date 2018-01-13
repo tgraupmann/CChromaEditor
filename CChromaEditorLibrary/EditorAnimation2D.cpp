@@ -7,27 +7,21 @@ using namespace std;
 
 EditorAnimation2D::EditorAnimation2D()
 {
-	Reset();
 }
 
-AnimationBase* EditorAnimation2D::GetAnimation()
+Animation2D* EditorAnimation2D::GetAnimation2D()
 {
-	return &_mAnimation;
-}
-
-void EditorAnimation2D::SetAnimation(Animation2D& animation)
-{
-	_mAnimation = animation;
+	return (Animation2D*)GetAnimation();
 }
 
 EChromaSDKDevice2DEnum EditorAnimation2D::GetDevice()
 {
-	return _mAnimation.GetDevice();
+	return GetAnimation2D()->GetDevice();
 }
 
 bool EditorAnimation2D::SetDevice(EChromaSDKDevice2DEnum device)
 {
-	if (_mAnimation.SetDevice(device))
+	if (GetAnimation2D()->SetDevice(device))
 	{
 		Reset();
 		return true;
@@ -40,7 +34,7 @@ bool EditorAnimation2D::SetDevice(EChromaSDKDevice2DEnum device)
 
 vector<FChromaSDKColorFrame2D>& EditorAnimation2D::GetFrames()
 {
-	return _mAnimation.GetFrames();
+	return GetAnimation2D()->GetFrames();
 }
 
 void EditorAnimation2D::Reset()

@@ -138,20 +138,47 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 void CMainViewDlg::LoadFile()
 {
 	AnimationBase* animation = nullptr;
+	int animationId;
 	if (_mPath.empty())
 	{
-		animation = ChromaSDKPlugin::GetInstance()->CreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditChromaLink)->SetAnimation(animation);
+
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditHeadset)->SetAnimation(animation);
+
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditKeyboard)->SetAnimation(animation);
+
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditKeypad)->SetAnimation(animation);
+
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditMouse)->SetAnimation(animation);
+
+		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
+		animation = GetAnimationInstance(animationId);
+		((EditorAnimationBase*)&_mEditMousepad)->SetAnimation(animation);
 	}
 	else
 	{
-		animation = ChromaSDKPlugin::GetInstance()->OpenAnimation(_mPath);
-	}
-	if (animation != nullptr)
-	{
-		SetDeviceType(animation);
-		SetPath(_mPath);
-		SetAnimation(animation);
-		Reset();
+		animationId = PluginOpenAnimation(_mPath.c_str());
+		if (animationId >= 0)
+		{
+			animation = GetAnimationInstance(animationId);
+			if (animation != nullptr)
+			{
+				SetDeviceType(animation);
+				SetPath(_mPath);
+				SetAnimation(animation);
+				Reset();
+			}
+		}
 	}
 }
 
@@ -288,59 +315,70 @@ void CMainViewDlg::RefreshDevice()
 	}
 
 	GetControlListTypes()->ResetContent();
-	
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_ChromaLink)
+
+	if (GetAnimation() == nullptr)
 	{
-		GetControlListTypes()->AddString(_T("[x] ChromaLink"));
+		//disabled
+		GetEnabledButton()->SetWindowTextW(_T("Enable"));
 	}
 	else
+	{
+		//enabled
+		GetEnabledButton()->SetWindowTextW(_T("Disable"));
+	}
+	
+	if (_mEditChromaLink.GetAnimation() == nullptr)
 	{
 		GetControlListTypes()->AddString(_T("ChromaLink"));
 	}
+	else
+	{
+		GetControlListTypes()->AddString(_T("[x] ChromaLink"));
+	}
 
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_Headset)
+	if (_mEditHeadset.GetAnimation() == nullptr)
+	{
+		GetControlListTypes()->AddString(_T("Headset")); 
+	}
+	else
 	{
 		GetControlListTypes()->AddString(_T("[x] Headset"));
 	}
-	else
-	{
-		GetControlListTypes()->AddString(_T("Headset"));
-	}
 
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_Keyboard)
+	if (_mEditKeyboard.GetAnimation() == nullptr)
+	{
+		GetControlListTypes()->AddString(_T("Keyboard")); 
+	}
+	else
 	{
 		GetControlListTypes()->AddString(_T("[x] Keyboard"));
 	}
-	else
-	{
-		GetControlListTypes()->AddString(_T("Keyboard"));
-	}
 
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_Keypad)
+	if (_mEditKeypad.GetAnimation() == nullptr)
+	{
+		GetControlListTypes()->AddString(_T("Keypad")); 
+	}
+	else
 	{
 		GetControlListTypes()->AddString(_T("[x] Keypad"));
 	}
-	else
-	{
-		GetControlListTypes()->AddString(_T("Keypad"));
-	}
 
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_Mouse)
-	{
-		GetControlListTypes()->AddString(_T("[x] Mouse"));
-	}
-	else
+	if (_mEditMouse.GetAnimation() == nullptr)
 	{
 		GetControlListTypes()->AddString(_T("Mouse"));
 	}
-
-	if (_mDevice == EChromaSDKDeviceEnum::EDIT_Mousepad)
+	else
 	{
-		GetControlListTypes()->AddString(_T("[x] Mousepad"));
+		GetControlListTypes()->AddString(_T("[x] Mouse")); 
+	}
+
+	if (_mEditMousepad.GetAnimation() == nullptr)
+	{
+		GetControlListTypes()->AddString(_T("Mousepad")); 
 	}
 	else
 	{
-		GetControlListTypes()->AddString(_T("Mousepad"));
+		GetControlListTypes()->AddString(_T("[x] Mousepad"));
 	}
 }
 
@@ -564,15 +602,13 @@ CListBox* CMainViewDlg::GetControlListTypes()
 	return (CListBox*)GetDlgItem(IDC_LIST_TYPES);
 }
 
+CButton* CMainViewDlg::GetEnabledButton()
+{
+	return (CButton*)GetDlgItem(IDC_BUTTON_ENABLE);
+}
+
 BOOL CMainViewDlg::OnInitDialog()
 {
-	_mEditChromaLink.SetDevice(EChromaSDKDevice1DEnum::DE_ChromaLink);
-	_mEditHeadset.SetDevice(EChromaSDKDevice1DEnum::DE_Headset);
-	_mEditKeyboard.SetDevice(EChromaSDKDevice2DEnum::DE_Keyboard);
-	_mEditKeypad.SetDevice(EChromaSDKDevice2DEnum::DE_Keypad);
-	_mEditMouse.SetDevice(EChromaSDKDevice2DEnum::DE_Mouse);
-	_mEditMousepad.SetDevice(EChromaSDKDevice1DEnum::DE_Mousepad);
-
 	LoadFile();
 
 	// setup dialog
@@ -660,10 +696,13 @@ BOOL CMainViewDlg::OnInitDialog()
 		OnBnClickedButtonPlay();
 	}
 
+	int index = (int)_mDevice;
+	GetControlListTypes()->SetCurSel(index);
+
 	return TRUE;
 }
 
-void CMainViewDlg::ListTypesOnSelChange()
+void CMainViewDlg::OnSelChangeListTypes()
 {
 	// stop animation
 	OnBnClickedButtonStop();
@@ -728,6 +767,8 @@ void CMainViewDlg::ListTypesOnSelChange()
 		// Display grid
 		RefreshGrid();
 	}
+
+	GetControlListTypes()->SetCurSel(index);
 
 	//show changes
 	OnBnClickedButtonPreview();
@@ -833,7 +874,8 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &CMainViewDlg::OnBnClickedButtonReset)
 	ON_COMMAND_RANGE(ID_DYNAMIC_BUTTON_MIN, ID_DYNAMIC_BUTTON_MAX, &CMainViewDlg::OnBnClickedButtonColor)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DURATION, &CMainViewDlg::OnBnClickedButtonSetDuration)
-	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::ListTypesOnSelChange)
+	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::OnSelChangeListTypes)
+	ON_BN_CLICKED(IDC_BUTTON_ENABLE, &CMainViewDlg::OnBnClickedButtonEnable)
 	ON_BN_CLICKED(ID_MENU_NEW, &CMainViewDlg::OnBnClickedMenuNew)
 	ON_BN_CLICKED(ID_MENU_OPEN, &CMainViewDlg::OnBnClickedMenuOpen)
 	ON_BN_CLICKED(ID_MENU_SAVE, &CMainViewDlg::OnBnClickedMenuSave)
@@ -1462,6 +1504,31 @@ void CMainViewDlg::OnBnClickedButtonPlay()
 	{
 		GetAnimation()->Play(false);
 	}
+}
+
+void CMainViewDlg::OnBnClickedButtonEnable()
+{
+	AnimationBase* animation = GetAnimation();
+	if (animation != nullptr)
+	{
+		int animationId = PluginGetAnimationIdFromInstance(animation);
+		if (animationId >= 0)
+		{
+			PluginStopAnimation(animationId);
+			PluginUnloadAnimation(animationId);
+			PluginCloseAnimation(animationId);
+		}
+	}
+	GetEditor()->SetAnimation(nullptr);
+
+	// Create the grid buttons
+	RecreateGrid();
+
+	// Display enums
+	RefreshDevice();
+
+	// Display grid
+	RefreshGrid();
 }
 
 void CMainViewDlg::OnBnClickedButtonLoop()

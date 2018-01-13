@@ -9,8 +9,7 @@ namespace ChromaSDK
 	{
 	public:
 		EditorAnimation1D();
-		AnimationBase* GetAnimation();
-		void SetAnimation(Animation1D& animation);
+		Animation1D* GetAnimation1D();
 		EChromaSDKDevice1DEnum GetDevice();
 		bool SetDevice(EChromaSDKDevice1DEnum device);
 		std::vector<FChromaSDKColorFrame1D>& GetFrames();
@@ -22,7 +21,6 @@ namespace ChromaSDK
 		void CopyPixels(COLORREF* pColor, UINT width, UINT height);
 		void AddFrame();
 	private:
-		Animation1D _mAnimation;
 		FChromaSDKColorFrame1D _mFrameCopy;
 	};
 }

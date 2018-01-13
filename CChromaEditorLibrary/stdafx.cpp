@@ -1287,6 +1287,18 @@ extern "C"
 		return -1;
 	}
 
+	int PluginGetAnimationIdFromInstance(AnimationBase* animation)
+	{
+		for (int index = 0; index < _gAnimations.size(); ++index)
+		{
+			if (_gAnimations[index] == animation)
+			{
+				return index;
+			}
+		}
+		return -1;
+	}
+
 	AnimationBase* GetAnimationInstance(int animationId)
 	{
 		if (_gAnimations.find(animationId) != _gAnimations.end())

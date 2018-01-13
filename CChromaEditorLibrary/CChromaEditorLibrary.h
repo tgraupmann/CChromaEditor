@@ -92,6 +92,9 @@ public:
 	afx_msg void OnBnClickedMenuSave();
 	afx_msg void OnBnClickedMenuSaveAs();
 	afx_msg void OnBnClickedMenuExit();
+	afx_msg void OnBnClickedButtonLoop();
+	afx_msg void OnBnClickedButtonEnable();
+	afx_msg void OnSelChangeListTypes();
 
 	void OnBnClickedButtonColor(UINT nID);
 
@@ -129,6 +132,7 @@ private:
 
 	CMenu* GetControlMenu();
 	CListBox* GetControlListTypes();
+	CButton* GetEnabledButton();
 	CEdit* GetControlOverrideTime();
 	CStatic* GetControlGridSize();
 	CStatic* GetControlSetKeyLabel();
@@ -177,7 +181,4 @@ private:
 
 	// keyboard input
 	bool _mControlModifier;
-public:
-	afx_msg void OnBnClickedButtonLoop();
-	afx_msg void ListTypesOnSelChange();
 };
