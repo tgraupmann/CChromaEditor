@@ -65,8 +65,8 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButtonImportImage();
-	afx_msg void OnBnClickedButtonImportAnimation();
+	afx_msg void OnBnClickedMenuImportImage();
+	afx_msg void OnBnClickedMenuImportAnimation();
 	afx_msg void OnBnClickedButtonImportOverrideTime();
 	afx_msg void OnBnClickedCheckUseKeyboardKeyType();
 	afx_msg void OnBnClickedButtonClear();

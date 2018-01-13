@@ -860,8 +860,6 @@ void CMainViewDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 
-	ON_BN_CLICKED(IDC_BUTTON_IMPORT_IMAGE, &CMainViewDlg::OnBnClickedButtonImportImage)
-	ON_BN_CLICKED(IDC_BUTTON_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedButtonImportAnimation)
 	ON_BN_CLICKED(IDC_BUTTON_IMPORT_OVERRIDE_TIME, &CMainViewDlg::OnBnClickedButtonImportOverrideTime)
 	ON_BN_CLICKED(IDC_CHECK_USE_KEYBOARD_CUSTOM_KEY_TYPE, &CMainViewDlg::OnBnClickedCheckUseKeyboardKeyType)
 	ON_BN_CLICKED(IDC_BUTTON_CLEAR, &CMainViewDlg::OnBnClickedButtonClear)
@@ -891,6 +889,8 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_SAVE, &CMainViewDlg::OnBnClickedMenuSave)
 	ON_BN_CLICKED(ID_MENU_SAVE_AS, &CMainViewDlg::OnBnClickedMenuSaveAs)
 	ON_BN_CLICKED(ID_MENU_EXIT, &CMainViewDlg::OnBnClickedMenuExit)
+	ON_BN_CLICKED(ID_MENU_IMPORT_IMAGE, &CMainViewDlg::OnBnClickedMenuImportImage)
+	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
 END_MESSAGE_MAP()
 
 vector<CColorButton*>& CMainViewDlg::GetGridButtons()
@@ -1011,7 +1011,7 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 	OnBnClickedButtonPreview();
 }
 
-void CMainViewDlg::OnBnClickedButtonImportImage()
+void CMainViewDlg::OnBnClickedMenuImportImage()
 {
 	// stop animation
 	OnBnClickedButtonStop();
@@ -1031,7 +1031,7 @@ void CMainViewDlg::OnBnClickedButtonImportImage()
 }
 
 
-void CMainViewDlg::OnBnClickedButtonImportAnimation()
+void CMainViewDlg::OnBnClickedMenuImportAnimation()
 {
 	// stop animation
 	OnBnClickedButtonStop();
