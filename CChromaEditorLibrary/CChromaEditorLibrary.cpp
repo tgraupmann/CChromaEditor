@@ -143,27 +143,33 @@ void CMainViewDlg::LoadFile()
 	{
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditChromaLink)->SetAnimation(animation);
+		_mEditChromaLink.SetAnimation(animation);
+		_mEditChromaLink.Reset();
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditHeadset)->SetAnimation(animation);
+		_mEditHeadset.SetAnimation(animation);
+		_mEditHeadset.Reset();
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditKeyboard)->SetAnimation(animation);
+		_mEditKeyboard.SetAnimation(animation);
+		_mEditKeyboard.Reset();
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditKeypad)->SetAnimation(animation);
+		_mEditKeypad.SetAnimation(animation);
+		_mEditKeypad.Reset();
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditMouse)->SetAnimation(animation);
+		_mEditMouse.SetAnimation(animation);
+		_mEditMouse.Reset();
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
 		animation = GetAnimationInstance(animationId);
-		((EditorAnimationBase*)&_mEditMousepad)->SetAnimation(animation);
+		_mEditMousepad.SetAnimation(animation);
+		_mEditMousepad.Reset();
 	}
 	else
 	{
@@ -1016,12 +1022,7 @@ void CMainViewDlg::OnBnClickedMenuImportImage()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	EditorAnimationBase* editor = GetEditor();
-	if (editor == nullptr)
-	{
-		return;
-	}
-	editor->ImportTextureImage();
+	GetEditor()->ImportTextureImage();
 	RefreshGrid();
 	RefreshFrames();
 	SaveFile();
@@ -1036,12 +1037,7 @@ void CMainViewDlg::OnBnClickedMenuImportAnimation()
 	// stop animation
 	OnBnClickedButtonStop();
 
-	EditorAnimationBase* editor = GetEditor();
-	if (editor == nullptr)
-	{
-		return;
-	}
-	editor->ImportTextureAnimation();
+	GetEditor()->ImportTextureAnimation();
 	RefreshGrid();
 	RefreshFrames();
 	SaveFile();
@@ -1535,32 +1531,38 @@ void CMainViewDlg::OnBnClickedButtonEnable()
 		case EChromaSDKDeviceEnum::EDIT_ChromaLink:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditChromaLink)->SetAnimation(animation);
+			_mEditChromaLink.SetAnimation(animation);
+			_mEditChromaLink.Reset();
 			break;
 		case EChromaSDKDeviceEnum::EDIT_Headset:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditHeadset)->SetAnimation(animation);
+			_mEditHeadset.SetAnimation(animation);
+			_mEditHeadset.Reset();
 			break;
 		case EChromaSDKDeviceEnum::EDIT_Keyboard:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditKeyboard)->SetAnimation(animation);
+			_mEditKeyboard.SetAnimation(animation);
+			_mEditKeyboard.Reset();
 			break;
 		case EChromaSDKDeviceEnum::EDIT_Keypad:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditKeypad)->SetAnimation(animation);
+			_mEditKeypad.SetAnimation(animation);
+			_mEditKeypad.Reset();
 			break;
 		case EChromaSDKDeviceEnum::EDIT_Mouse:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditMouse)->SetAnimation(animation);
+			_mEditMouse.SetAnimation(animation);
+			_mEditMouse.Reset();
 			break;
 		case EChromaSDKDeviceEnum::EDIT_Mousepad:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
 			animation = GetAnimationInstance(animationId);
-			((EditorAnimationBase*)&_mEditMousepad)->SetAnimation(animation);
+			_mEditMousepad.SetAnimation(animation);
+			_mEditMousepad.Reset();
 			break;
 		}
 		GetEditor()->SetAnimation(animation);
