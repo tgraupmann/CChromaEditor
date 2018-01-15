@@ -1200,6 +1200,25 @@ bool CMainViewDlg::GetCurrentFrame1D(FChromaSDKColorFrame1D& frame)
 	return false;
 }
 
+bool CMainViewDlg::SetCurrentFrame1D(FChromaSDKColorFrame1D& frame)
+{
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
+	if (currentFrame < 0 ||
+		currentFrame >= frameCount)
+	{
+		currentFrame = 0;
+	}
+	if (currentFrame < frameCount &&
+		GetDeviceType() == EChromaSDKDeviceTypeEnum::DE_1D)
+	{
+		vector<FChromaSDKColorFrame1D>& frames = GetEditor1D()->GetFrames();
+		frames[currentFrame] = frame;
+		return true;
+	}
+	return false;
+}
+
 bool CMainViewDlg::GetCurrentFrame2D(FChromaSDKColorFrame2D& frame)
 {
 	int currentFrame = GetCurrentFrame();
@@ -1219,6 +1238,25 @@ bool CMainViewDlg::GetCurrentFrame2D(FChromaSDKColorFrame2D& frame)
 	return false;
 }
 
+bool CMainViewDlg::SetCurrentFrame2D(FChromaSDKColorFrame2D& frame)
+{
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
+	if (currentFrame < 0 ||
+		currentFrame >= frameCount)
+	{
+		currentFrame = 0;
+	}
+	if (currentFrame < frameCount &&
+		GetDeviceType() == EChromaSDKDeviceTypeEnum::DE_2D)
+	{
+		vector<FChromaSDKColorFrame2D>& frames = GetEditor2D()->GetFrames();
+		frames[currentFrame] = frame;
+		return true;
+	}
+	return false;
+}
+
 void CMainViewDlg::OnBnClickedButtonClear()
 {
 	// stop animation
@@ -1233,12 +1271,14 @@ void CMainViewDlg::OnBnClickedButtonClear()
 		if (GetCurrentFrame1D(frame1D))
 		{
 			frame1D.Colors = CreateColors1D();
+			SetCurrentFrame1D(frame1D);
 		}
 		break;
 	case EChromaSDKDeviceTypeEnum::DE_2D:
 		if (GetCurrentFrame2D(frame2D))
 		{
 			frame2D.Colors = CreateColors2D();
+			SetCurrentFrame2D(frame2D);
 		}
 		break;
 	}
@@ -1271,6 +1311,7 @@ void CMainViewDlg::OnBnClickedButtonFill()
 				{
 					frame1D.Colors[i] = _mColor;
 				}
+				SetCurrentFrame1D(frame1D);
 			}
 			break;
 		case EChromaSDKDeviceTypeEnum::DE_2D:
@@ -1285,6 +1326,7 @@ void CMainViewDlg::OnBnClickedButtonFill()
 						row.Colors[j] = _mColor;
 					}
 				}
+				SetCurrentFrame2D(frame2D);
 			}
 			break;
 	}
@@ -1311,6 +1353,7 @@ void CMainViewDlg::OnBnClickedButtonRandom()
 		{
 			EChromaSDKDevice1DEnum device = GetEditor1D()->GetDevice();
 			frame1D.Colors = ChromaSDKPlugin::GetInstance()->CreateRandomColors1D(device);
+			SetCurrentFrame1D(frame1D);
 		}
 		break;
 	case EChromaSDKDeviceTypeEnum::DE_2D:
@@ -1318,6 +1361,7 @@ void CMainViewDlg::OnBnClickedButtonRandom()
 		{
 			EChromaSDKDevice2DEnum device = GetEditor2D()->GetDevice();
 			frame2D.Colors = ChromaSDKPlugin::GetInstance()->CreateRandomColors2D(device);
+			SetCurrentFrame2D(frame2D);
 		}
 		break;
 	}

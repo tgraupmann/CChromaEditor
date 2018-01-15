@@ -127,6 +127,9 @@ private:
 	bool GetCurrentFrame1D(FChromaSDKColorFrame1D& frame);
 	bool GetCurrentFrame2D(FChromaSDKColorFrame2D& frame);
 
+	bool SetCurrentFrame1D(FChromaSDKColorFrame1D& frame);
+	bool SetCurrentFrame2D(FChromaSDKColorFrame2D& frame);
+
 	std::string _mPath;
 	bool _mPlayOnOpen;
 
