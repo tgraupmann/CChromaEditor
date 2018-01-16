@@ -137,6 +137,7 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 
 void CMainViewDlg::LoadFile()
 {
+	AnimationBase* selectedAnimation = nullptr;
 	AnimationBase* animation = nullptr;
 	int animationId;
 	if (_mPath.empty())
@@ -145,6 +146,7 @@ void CMainViewDlg::LoadFile()
 		animation = GetAnimationInstance(animationId);
 		_mEditChromaLink.SetAnimation(animation);
 		_mEditChromaLink.Reset();
+		selectedAnimation = animation;
 
 		animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
 		animation = GetAnimationInstance(animationId);
@@ -173,17 +175,83 @@ void CMainViewDlg::LoadFile()
 	}
 	else
 	{
-		animationId = PluginOpenAnimation(_mPath.c_str());
-		if (animationId >= 0)
+		FILE* stream = nullptr;
+		if (0 != fopen_s(&stream, _mPath.c_str(), "rb") ||
+			stream == nullptr)
 		{
-			animation = GetAnimationInstance(animationId);
-			if (animation != nullptr)
+			LogError("OpenAnimation: Failed to open animation! %s\r\n", _mPath.c_str());
+		}
+		else
+		{
+			_mEditChromaLink.SetAnimation(nullptr);
+			_mEditHeadset.SetAnimation(nullptr);
+			_mEditKeyboard.SetAnimation(nullptr);
+			_mEditKeypad.SetAnimation(nullptr);
+			_mEditMouse.SetAnimation(nullptr);
+			_mEditMousepad.SetAnimation(nullptr);
+
+			do
 			{
-				SetDeviceType(animation);
-				SetPath(_mPath);
-				SetAnimation(animation);
-				Reset();
-			}
+				animation = ChromaSDKPlugin::GetInstance()->OpenAnimationStream(stream);
+
+				if (animation != nullptr)
+				{
+					if (selectedAnimation == nullptr)
+					{
+						selectedAnimation = animation;
+					}
+
+					switch (animation->GetDeviceType())
+					{
+						case EChromaSDKDeviceTypeEnum::DE_1D:
+							switch (((Animation1D*)animation)->GetDevice())
+							{
+							case EChromaSDKDevice1DEnum::DE_ChromaLink:
+								_mEditChromaLink.SetAnimation(animation);
+								_mEditChromaLink.Reset();
+								break;
+							case EChromaSDKDevice1DEnum::DE_Headset:
+								_mEditHeadset.SetAnimation(animation);
+								_mEditHeadset.Reset();
+								break;
+							case EChromaSDKDevice1DEnum::DE_Mousepad:
+								_mEditMousepad.SetAnimation(animation);
+								_mEditMousepad.Reset();
+								break;
+							}
+							break;
+						case EChromaSDKDeviceTypeEnum::DE_2D:
+							switch (((Animation2D*)animation)->GetDevice())
+							{
+							case EChromaSDKDevice2DEnum::DE_Keyboard:
+								_mEditKeyboard.SetAnimation(animation);
+								_mEditKeyboard.Reset();
+								break;
+							case EChromaSDKDevice2DEnum::DE_Keypad:
+								_mEditKeypad.SetAnimation(animation);
+								_mEditKeypad.Reset();
+								break;
+							case EChromaSDKDevice2DEnum::DE_Mouse:
+								_mEditMouse.SetAnimation(animation);
+								_mEditMouse.Reset();
+								break;
+							}
+							break;
+					}
+				}
+				
+				LogDebug("OpenAnimation: Loaded %s\r\n", _mPath.c_str());
+			} while (animation != nullptr);
+
+			std::fclose(stream);
+		}
+
+		if (selectedAnimation != nullptr)
+		{
+			SetDeviceType(selectedAnimation);
+			SetPath(_mPath);
+			SetAnimation(selectedAnimation);
+			Reset();
 		}
 	}
 }
@@ -192,7 +260,27 @@ void CMainViewDlg::SaveFile()
 {
 	if (!_mPath.empty())
 	{
-		GetAnimation()->Save(_mPath.c_str());
+		const char* path = _mPath.c_str();
+
+		FILE* stream;
+		int result = fopen_s(&stream, path, "wb");
+		if (result == 13)
+		{
+			fprintf(stderr, "Save: Permission denied! %s\r\n", path);
+		}
+		else if (0 == result &&
+			stream)
+		{
+			_mEditChromaLink.SaveStream(stream);
+			_mEditHeadset.SaveStream(stream);
+			_mEditKeyboard.SaveStream(stream);
+			_mEditKeypad.SaveStream(stream);
+			_mEditMouse.SaveStream(stream);
+			_mEditMousepad.SaveStream(stream);
+
+			fflush(stream);
+			std::fclose(stream);
+		}
 	}
 }
 

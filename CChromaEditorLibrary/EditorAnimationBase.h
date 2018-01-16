@@ -20,6 +20,7 @@ public:
 	void SetPath(const std::string& path);
 	virtual void Reset() = 0;
 	virtual void Stop();
+	virtual void SaveStream(FILE* stream);
 private:
 	std::string _mPath;
 	ChromaSDK::AnimationBase* _mAnimation;

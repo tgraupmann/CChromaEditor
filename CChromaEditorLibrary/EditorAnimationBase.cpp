@@ -361,3 +361,12 @@ void EditorAnimationBase::Stop()
 	}
 	GetAnimation()->Stop();
 }
+
+void EditorAnimationBase::SaveStream(FILE* stream)
+{
+	AnimationBase* animation = GetAnimation();
+	if (animation != nullptr)
+	{
+		animation->SaveStream(stream);
+	}
+}

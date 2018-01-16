@@ -28,6 +28,7 @@ namespace ChromaSDK
 		virtual void Stop() = 0;
 		virtual void Update(float deltaTime) = 0;
 		virtual void ResetFrames() = 0;
+		virtual void SaveStream(FILE* stream) = 0;
 		virtual int Save(const char* path) = 0;
 	protected:
 		std::string _mName;

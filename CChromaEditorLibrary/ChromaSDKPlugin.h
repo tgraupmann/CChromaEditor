@@ -53,6 +53,7 @@ namespace ChromaSDK
 		const char* GetMouseChar(EChromaSDKMouseLED led);
 
 		AnimationBase* CreateAnimationInMemory(int deviceType, int device);
+		AnimationBase* OpenAnimationStream(FILE* stream);
 		AnimationBase* OpenAnimation(const std::string& path);
 	private:
 		ChromaSDKPlugin();
