@@ -240,7 +240,7 @@ void CMainViewDlg::LoadFile()
 					}
 				}
 				
-				LogDebug("OpenAnimation: Loaded %s\r\n", _mPath.c_str());
+				//LogDebug("OpenAnimation: Loaded %s\r\n", _mPath.c_str());
 			} while (animation != nullptr);
 
 			std::fclose(stream);

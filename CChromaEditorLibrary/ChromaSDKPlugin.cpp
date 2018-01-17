@@ -56,12 +56,6 @@ ChromaSDKPlugin::ChromaSDKPlugin()
 	{
 		return;
 	}
-	_mMethodUnInit = (CHROMA_SDK_UNINIT)GetProcAddress(_mLibraryChroma, "UnInit");
-	if (ValidateGetProcAddress(_mMethodUnInit == nullptr, "UnInit"))
-	{
-		return;
-	}
-
 	_mMethodCreateChromaLinkEffect = (CHROMA_SDK_CREATE_CHROMA_LINK_EFFECT)GetProcAddress(_mLibraryChroma, "CreateChromaLinkEffect");
 	if (ValidateGetProcAddress(_mMethodCreateChromaLinkEffect == nullptr, "CreateChromaLinkEffect"))
 	{
@@ -1152,7 +1146,7 @@ AnimationBase* ChromaSDKPlugin::OpenAnimationStream(FILE* stream)
 	read = fread(&version, expectedSize, 1, stream);
 	if (read != expectedRead)
 	{
-		LogError("OpenAnimation: Failed to read version!\r\n");
+		//LogError("OpenAnimation: Failed to read version!\r\n");
 		std::fclose(stream);
 		return nullptr;
 	}
@@ -1163,7 +1157,7 @@ AnimationBase* ChromaSDKPlugin::OpenAnimationStream(FILE* stream)
 		return nullptr;
 	}
 
-	LogDebug("OpenAnimation: Version: %d\r\n", version);
+	//LogDebug("OpenAnimation: Version: %d\r\n", version);
 
 	//device
 	byte device = 0;
@@ -1184,10 +1178,10 @@ AnimationBase* ChromaSDKPlugin::OpenAnimationStream(FILE* stream)
 		switch ((EChromaSDKDeviceTypeEnum)deviceType)
 		{
 		case EChromaSDKDeviceTypeEnum::DE_1D:
-			LogDebug("OpenAnimation: DeviceType: 1D\r\n");
+			//LogDebug("OpenAnimation: DeviceType: 1D\r\n");
 			break;
 		case EChromaSDKDeviceTypeEnum::DE_2D:
-			LogDebug("OpenAnimation: DeviceType: 2D\r\n");
+			//LogDebug("OpenAnimation: DeviceType: 2D\r\n");
 			break;
 		default:
 			LogError("OpenAnimation: Unexpected DeviceType!\r\n");
