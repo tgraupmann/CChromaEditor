@@ -239,6 +239,43 @@ namespace ChromaSDK
 
 	int AnimationComposite::Save(const char* path)
 	{
+		FILE* stream;
+		int result = fopen_s(&stream, path, "wb");
+		if (result == 13)
+		{
+			fprintf(stderr, "Save: Permission denied! %s\r\n", path);
+		}
+		else if (0 == result &&
+			stream)
+		{
+			if (_mAnimationChromaLink != nullptr)
+			{
+				_mAnimationChromaLink->SaveStream(stream);
+			}
+			if (_mAnimationHeadset != nullptr)
+			{
+				_mAnimationHeadset->SaveStream(stream);
+			}
+			if (_mAnimationKeyboard != nullptr)
+			{
+				_mAnimationKeyboard->SaveStream(stream);
+			}
+			if (_mAnimationKeypad != nullptr)
+			{
+				_mAnimationKeypad->SaveStream(stream);
+			}
+			if (_mAnimationMouse != nullptr)
+			{
+				_mAnimationMouse->SaveStream(stream);
+			}
+			if (_mAnimationMousepad != nullptr)
+			{
+				_mAnimationMousepad->SaveStream(stream);
+			}
+
+			fflush(stream);
+			std::fclose(stream);
+		}
 		return -1;
 	}
 }
