@@ -1439,3 +1439,160 @@ AnimationBase* ChromaSDKPlugin::OpenAnimation(const string& path)
 
 	return animation;
 }
+
+AnimationBase* ChromaSDKPlugin::OpenAnimationWithType(const string& path, EChromaSDKDeviceEnum device)
+{
+	AnimationBase* animation = nullptr;
+
+	LogDebug("OpenAnimationWithType: %s\r\n", path.c_str());
+	FILE* stream = nullptr;
+	if (0 != fopen_s(&stream, path.c_str(), "rb") ||
+		stream == nullptr)
+	{
+		LogError("OpenAnimationWithType: Failed to open animation! %s\r\n", path.c_str());
+	}
+	else
+	{
+		EChromaSDKDeviceTypeEnum targetDeviceType = GetDeviceType(device);
+		EChromaSDKDevice1DEnum targetDevice1D;
+		EChromaSDKDevice2DEnum targetDevice2D;
+		switch (targetDeviceType)
+		{
+		case EChromaSDKDeviceTypeEnum::DE_1D:
+			targetDevice1D = GetDevice1D(device);
+			break;
+		case EChromaSDKDeviceTypeEnum::DE_2D:
+			targetDevice2D = GetDevice2D(device);
+			break;
+		}
+		while (true)
+		{
+			animation = OpenAnimationStream(stream);
+			if (nullptr == animation)
+			{
+				break;
+			}
+			EChromaSDKDeviceTypeEnum deviceType = animation->GetDeviceType();
+			if (targetDeviceType != deviceType)
+			{
+				delete animation;
+				continue;
+			}
+			Animation1D* animation1D;
+			Animation2D* animation2D;
+			bool match = false;
+			switch (targetDeviceType)
+			{
+			case EChromaSDKDeviceTypeEnum::DE_1D:
+				animation1D = (Animation1D*)animation;
+				if (targetDevice1D == animation1D->GetDevice())
+				{
+					match = true;
+				}
+				break;
+			case EChromaSDKDeviceTypeEnum::DE_2D:
+				animation2D = (Animation2D*)animation;
+				if (targetDevice2D == animation2D->GetDevice())
+				{
+					match = true;
+				}
+				break;
+			}
+			if (!match)
+			{
+				delete animation;
+				continue;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		std::fclose(stream);
+		LogDebug("OpenAnimationWithType: Loaded %s\r\n", path.c_str());
+	}
+
+	return animation;
+}
+
+EChromaSDKDeviceEnum ChromaSDKPlugin::GetDeviceEnum1D(EChromaSDKDevice1DEnum device1D)
+{
+	switch (device1D)
+	{
+	case EChromaSDKDevice1DEnum::DE_ChromaLink:
+		return EChromaSDKDeviceEnum::EDIT_ChromaLink;
+	case EChromaSDKDevice1DEnum::DE_Headset:
+		return EChromaSDKDeviceEnum::EDIT_Headset;
+	case EChromaSDKDevice1DEnum::DE_Mousepad:
+		return EChromaSDKDeviceEnum::EDIT_Mousepad;
+	default:
+		throw exception("Invalid type!");
+	}
+}
+
+EChromaSDKDeviceEnum ChromaSDKPlugin::GetDeviceEnum2D(EChromaSDKDevice2DEnum device2D)
+{
+	switch (device2D)
+	{
+	case EChromaSDKDevice2DEnum::DE_Keyboard:
+		return EChromaSDKDeviceEnum::EDIT_Keyboard;
+	case EChromaSDKDevice2DEnum::DE_Keypad:
+		return EChromaSDKDeviceEnum::EDIT_Keypad;
+	case EChromaSDKDevice2DEnum::DE_Mouse:
+		return EChromaSDKDeviceEnum::EDIT_Mouse;
+	default:
+		throw exception("Invalid type!");
+	}
+}
+
+EChromaSDKDeviceTypeEnum ChromaSDKPlugin::GetDeviceType(EChromaSDKDeviceEnum device)
+{
+	switch (device)
+	{
+	case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+		return EChromaSDKDeviceTypeEnum::DE_1D;
+	case EChromaSDKDeviceEnum::EDIT_Headset:
+		return EChromaSDKDeviceTypeEnum::DE_1D;
+	case EChromaSDKDeviceEnum::EDIT_Keyboard:
+		return EChromaSDKDeviceTypeEnum::DE_2D;
+	case EChromaSDKDeviceEnum::EDIT_Keypad:
+		return EChromaSDKDeviceTypeEnum::DE_2D;
+	case EChromaSDKDeviceEnum::EDIT_Mouse:
+		return EChromaSDKDeviceTypeEnum::DE_2D;
+	case EChromaSDKDeviceEnum::EDIT_Mousepad:
+		return EChromaSDKDeviceTypeEnum::DE_1D;
+	default:
+		throw exception("Invalid type!");
+	}
+}
+
+EChromaSDKDevice1DEnum ChromaSDKPlugin::GetDevice1D(EChromaSDKDeviceEnum device)
+{
+	switch (device)
+	{
+	case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+		return EChromaSDKDevice1DEnum::DE_ChromaLink;
+	case EChromaSDKDeviceEnum::EDIT_Headset:
+		return EChromaSDKDevice1DEnum::DE_Headset;
+	case EChromaSDKDeviceEnum::EDIT_Mousepad:
+		return EChromaSDKDevice1DEnum::DE_Mousepad;
+	default:
+		throw exception("Invalid type!");
+	}
+}
+
+EChromaSDKDevice2DEnum ChromaSDKPlugin::GetDevice2D(EChromaSDKDeviceEnum device)
+{
+	switch (device)
+	{
+	case EChromaSDKDeviceEnum::EDIT_Keyboard:
+		return EChromaSDKDevice2DEnum::DE_Keyboard;
+	case EChromaSDKDeviceEnum::EDIT_Keypad:
+		return EChromaSDKDevice2DEnum::DE_Keypad;
+	case EChromaSDKDeviceEnum::EDIT_Mouse:
+		return EChromaSDKDevice2DEnum::DE_Mouse;
+	default:
+		throw exception("Invalid type!");
+	}
+}

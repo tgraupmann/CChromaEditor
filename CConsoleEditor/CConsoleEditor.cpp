@@ -1,6 +1,8 @@
 // CConsoleEditor.cpp : Defines the entry point for the console application.
 //
 
+//#define RUN_UNIT_TESTS true
+
 #define CHROMA_EDITOR_DLL _T("CChromaEditorLibrary.dll")
 
 #include "stdafx.h"
@@ -9,14 +11,16 @@
 #include <Windows.h>
 #include "..\CChromaEditorLibrary\ChromaSDKPluginTypes.h"
 
-typedef double(*PLUGIN_IS_INITIALIZED)();
-typedef double(*PLUGIN_IS_DIALOG_OPEN)();
-typedef double(*PLUGIN_OPEN_EDITOR_DIALOG)(const char* path);
-typedef double(*PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)(const char* path);
-typedef double(*PLUGIN_OPEN_ANIMATION)(const char* path);
-typedef double(*PLUGIN_CLOSE_ANIMATION)(double animationId);
-typedef double(*PLUGIN_PLAY_ANIMATION)(double animationId);
+typedef int(*PLUGIN_IS_INITIALIZED)();
+typedef int(*PLUGIN_IS_DIALOG_OPEN)();
+typedef int(*PLUGIN_OPEN_EDITOR_DIALOG)(const char* path);
+typedef int(*PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)(const char* path);
+typedef int(*PLUGIN_OPEN_ANIMATION)(const char* path);
+typedef int(*PLUGIN_OPEN_ANIMATION_WITH_TYPE)(const char* path, int device);
+typedef int(*PLUGIN_CLOSE_ANIMATION)(int animationId);
+typedef int(*PLUGIN_PLAY_ANIMATION)(int animationId);
 typedef void(*PLUGIN_PLAY_ANIMATION_NAME)(const char* path, bool loop);
+typedef void(*PLUGIN_STOP_ANIMATION)(int animationId);
 typedef void(*PLUGIN_STOP_ANIMATION_NAME)(const char* path);
 typedef void(*PLUGIN_STOP_ANIMATION_TYPE)(int deviceType, int device);
 typedef bool(*PLUGIN_IS_PLAYING_NAME)(const char* name);
@@ -39,9 +43,11 @@ PLUGIN_IS_DIALOG_OPEN _gMethodIsDialogOpen = nullptr;
 PLUGIN_OPEN_EDITOR_DIALOG _gMethodOpenDialog = nullptr;
 PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY _gMethodOpenDialogAndPlay = nullptr;
 PLUGIN_OPEN_ANIMATION _gMethodOpenAnimation = nullptr;
+PLUGIN_OPEN_ANIMATION_WITH_TYPE _gMethodOpenAnimationWithType = nullptr;
 PLUGIN_CLOSE_ANIMATION _gMethodCloseAnimation = nullptr;
 PLUGIN_PLAY_ANIMATION _gMethodPlayAnimation = nullptr;
 PLUGIN_PLAY_ANIMATION_NAME _gMethodPlayAnimationName = nullptr;
+PLUGIN_STOP_ANIMATION _gMethodStopAnimation = nullptr;
 PLUGIN_STOP_ANIMATION_NAME _gMethodStopAnimationName = nullptr;
 PLUGIN_STOP_ANIMATION_TYPE _gMethodStopAnimationType = nullptr;
 PLUGIN_IS_PLAYING_NAME _gMethodIsPlayingName = nullptr;
@@ -55,6 +61,10 @@ PLUGIN_GET_FRAME_COUNT_NAME _gMethodGetFrameCountName = nullptr;
 PLUGIN_SET_KEY_COLOR_NAME _gMethodSetKeyColorName = nullptr;
 PLUGIN_COPY_KEY_COLOR_NAME _gMethodCopyKeyColorName = nullptr;
 
+#if RUN_UNIT_TESTS
+void DebugUnitTests();
+#endif
+
 int Init()
 {
 	HMODULE library = LoadLibrary(CHROMA_EDITOR_DLL);
@@ -66,49 +76,56 @@ int Init()
 
 	fprintf(stderr, "Loaded Chroma Editor DLL!\r\n");
 
-	_gMethodIsInitialized = (PLUGIN_IS_DIALOG_OPEN)GetProcAddress(library, "PluginIsInitializedD");
+	_gMethodIsInitialized = (PLUGIN_IS_DIALOG_OPEN)GetProcAddress(library, "PluginIsInitialized");
 	if (_gMethodIsInitialized == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginIsInitialized!\r\n");
 		return -1;
 	}
 
-	_gMethodIsDialogOpen = (PLUGIN_IS_DIALOG_OPEN)GetProcAddress(library, "PluginIsDialogOpenD");
+	_gMethodIsDialogOpen = (PLUGIN_IS_DIALOG_OPEN)GetProcAddress(library, "PluginIsDialogOpen");
 	if (_gMethodIsDialogOpen == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginIsDialogOpen!\r\n");
 		return -1;
 	}
 
-	_gMethodOpenDialog = (PLUGIN_OPEN_EDITOR_DIALOG)GetProcAddress(library, "PluginOpenEditorDialogD");
+	_gMethodOpenDialog = (PLUGIN_OPEN_EDITOR_DIALOG)GetProcAddress(library, "PluginOpenEditorDialog");
 	if (_gMethodOpenDialog == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginOpenEditorDialog!\r\n");
 		return -1;
 	}
 
-	_gMethodOpenDialogAndPlay = (PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)GetProcAddress(library, "PluginOpenEditorDialogAndPlayD");
+	_gMethodOpenDialogAndPlay = (PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)GetProcAddress(library, "PluginOpenEditorDialogAndPlay");
 	if (_gMethodOpenDialogAndPlay == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginOpenEditorDialogAndPlay!\r\n");
 		return -1;
 	}
 
-	_gMethodOpenAnimation = (PLUGIN_OPEN_ANIMATION)GetProcAddress(library, "PluginOpenAnimationD");
+	_gMethodOpenAnimation = (PLUGIN_OPEN_ANIMATION)GetProcAddress(library, "PluginOpenAnimation");
 	if (_gMethodOpenAnimation == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginOpenAnimation!\r\n");
 		return -1;
 	}
 
-	_gMethodCloseAnimation = (PLUGIN_CLOSE_ANIMATION)GetProcAddress(library, "PluginCloseAnimationD");
+	_gMethodOpenAnimationWithType = (PLUGIN_OPEN_ANIMATION_WITH_TYPE)GetProcAddress(library, "PluginOpenAnimationWithType");
+	if (_gMethodOpenAnimationWithType == nullptr)
+	{
+		fprintf(stderr, "Failed to find method PluginOpenAnimationWithType!\r\n");
+		return -1;
+	}
+
+	_gMethodCloseAnimation = (PLUGIN_CLOSE_ANIMATION)GetProcAddress(library, "PluginCloseAnimation");
 	if (_gMethodCloseAnimation == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginCloseAnimation!\r\n");
 		return -1;
 	}
 
-	_gMethodPlayAnimation = (PLUGIN_PLAY_ANIMATION)GetProcAddress(library, "PluginPlayAnimationD");
+	_gMethodPlayAnimation = (PLUGIN_PLAY_ANIMATION)GetProcAddress(library, "PluginPlayAnimation");
 	if (_gMethodPlayAnimation == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginPlayAnimation!\r\n");
@@ -119,6 +136,13 @@ int Init()
 	if (_gMethodPlayAnimationName == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginPlayAnimationName!\r\n");
+		return -1;
+	}
+
+	_gMethodStopAnimation = (PLUGIN_STOP_ANIMATION)GetProcAddress(library, "PluginStopAnimation");
+	if (_gMethodStopAnimation == nullptr)
+	{
+		fprintf(stderr, "Failed to find method PluginStopAnimation!\r\n");
 		return -1;
 	}
 
@@ -233,15 +257,17 @@ int CloseAnimation(int animationId)
 	return result;
 }
 
-void DebugUnitTests();
-
 int main(int argc, char *argv[])
 {
 	fprintf(stderr, "App launched!\r\n");
 	if (Init() != 0)
 	{
 		return -1;
-	}	
+	}
+
+#if RUN_UNIT_TESTS
+	DebugUnitTests();
+#endif
 
 	if (argc <= 1)
 	{
@@ -280,6 +306,7 @@ void IsPlaying(const char* name)
 	fprintf(stdout, "Mousepad IsPlayingType: %s\r\n", _gMethodIsPlayingType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad) ? "true" : "false");
 }
 
+#if RUN_UNIT_TESTS
 void DebugUnitTests()
 {
 	if (false) // test editor
@@ -322,20 +349,31 @@ void DebugUnitTests()
 	}
 	else
 	{
-		const char* RANDOM_KEYBOARD = "Random_Keyboard.chroma";
-
-		int frameCount = _gMethodGetFrameCountName(RANDOM_KEYBOARD);
-		for (int index = 0; index < frameCount; ++index)
+		const char* fileAnimation = "Composite.chroma";
+		int animationId =_gMethodOpenAnimationWithType(fileAnimation, (int)EChromaSDKDeviceEnum::EDIT_Keyboard);
+		if (animationId >= 0)
 		{
-			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", RANDOM_KEYBOARD, index, (int)Keyboard::RZKEY::RZKEY_W);
-			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", RANDOM_KEYBOARD, index, (int)Keyboard::RZKEY::RZKEY_A);
-			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", RANDOM_KEYBOARD, index, (int)Keyboard::RZKEY::RZKEY_S);
-			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", RANDOM_KEYBOARD, index, (int)Keyboard::RZKEY::RZKEY_D);
+			_gMethodPlayAnimation(animationId);
 		}
-		_gMethodPlayAnimationName(RANDOM_KEYBOARD, true);
+		Sleep(3000);
+		if (animationId >= 0)
+		{
+			_gMethodStopAnimation(animationId);
+		}
 		Sleep(3000);
 
-		_gMethodCloseAnimationName(RANDOM_KEYBOARD);
+		int frameCount = _gMethodGetFrameCountName(fileAnimation);
+		for (int index = 0; index < frameCount; ++index)
+		{
+			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", fileAnimation, index, (int)Keyboard::RZKEY::RZKEY_W);
+			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", fileAnimation, index, (int)Keyboard::RZKEY::RZKEY_A);
+			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", fileAnimation, index, (int)Keyboard::RZKEY::RZKEY_S);
+			_gMethodCopyKeyColorName("Fire_Keyboard.chroma", fileAnimation, index, (int)Keyboard::RZKEY::RZKEY_D);
+		}
+		_gMethodPlayAnimationName(fileAnimation, true);
+		Sleep(3000);
+
+		_gMethodCloseAnimationName(fileAnimation);
 
 		fprintf(stdout, "Call: PlayComposite: Random\r\n");
 		_gMethodPlayComposite("Random", true);
@@ -353,15 +391,15 @@ void DebugUnitTests()
 		Sleep(3000);
 
 		fprintf(stdout, "Call: PlayAnimationName\r\n");
-		_gMethodPlayAnimationName(RANDOM_KEYBOARD, true);
+		_gMethodPlayAnimationName(fileAnimation, true);
 		Sleep(3000);
 
 		fprintf(stdout, "Call: StopAnimationName\r\n");
-		_gMethodStopAnimationName(RANDOM_KEYBOARD);
+		_gMethodStopAnimationName(fileAnimation);
 		Sleep(1000);
 
 		fprintf(stdout, "Call: PlayAnimationName\r\n");
-		_gMethodPlayAnimationName(RANDOM_KEYBOARD, true);
+		_gMethodPlayAnimationName(fileAnimation, true);
 		Sleep(3000);
 
 		fprintf(stdout, "Call: StopAnimationType\r\n");
@@ -373,3 +411,4 @@ void DebugUnitTests()
 		}
 	}
 }
+#endif

@@ -1252,6 +1252,16 @@ void CMainViewDlg::SetAnimation(AnimationBase* animation)
 	GetEditor()->SetAnimation(animation);
 }
 
+void CMainViewDlg::CloseAnimations()
+{
+	_mEditChromaLink.CloseAnimation();
+	_mEditHeadset.CloseAnimation();
+	_mEditKeyboard.CloseAnimation();
+	_mEditKeypad.CloseAnimation();
+	_mEditMouse.CloseAnimation();
+	_mEditMousepad.CloseAnimation();
+}
+
 void CMainViewDlg::Reset()
 {
 	GetEditor()->Reset();

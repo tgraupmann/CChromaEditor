@@ -55,6 +55,13 @@ namespace ChromaSDK
 		AnimationBase* CreateAnimationInMemory(int deviceType, int device);
 		AnimationBase* OpenAnimationStream(FILE* stream);
 		AnimationBase* OpenAnimation(const std::string& path);
+		AnimationBase* OpenAnimationWithType(const std::string& path, EChromaSDKDeviceEnum device);
+
+		EChromaSDKDeviceEnum GetDeviceEnum1D(EChromaSDKDevice1DEnum device1D);
+		EChromaSDKDeviceEnum GetDeviceEnum2D(EChromaSDKDevice2DEnum device2D);
+		EChromaSDKDeviceTypeEnum GetDeviceType(EChromaSDKDeviceEnum device);
+		EChromaSDKDevice1DEnum GetDevice1D(EChromaSDKDeviceEnum device);
+		EChromaSDKDevice2DEnum GetDevice2D(EChromaSDKDeviceEnum device);
 	private:
 		ChromaSDKPlugin();
 

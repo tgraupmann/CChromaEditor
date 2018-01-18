@@ -18,6 +18,7 @@ public:
 	virtual void CopyPixels(COLORREF* pColor, UINT width, UINT height) = 0;
 	virtual void AddFrame() = 0;
 	void SetPath(const std::string& path);
+	virtual void CloseAnimation();
 	virtual void Reset() = 0;
 	virtual void Stop();
 	virtual void SaveStream(FILE* stream);

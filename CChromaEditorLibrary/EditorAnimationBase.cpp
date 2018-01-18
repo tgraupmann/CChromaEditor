@@ -353,13 +353,30 @@ void EditorAnimationBase::SetPath(const string& path)
 	_mPath = path;
 }
 
+void EditorAnimationBase::CloseAnimation()
+{
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+	int animationId = PluginGetAnimationIdFromInstance(GetAnimation());
+	if (animationId >= 0)
+	{
+		PluginCloseAnimation(animationId);
+	}
+}
+
 void EditorAnimationBase::Stop()
 {
 	if (GetAnimation() == nullptr)
 	{
 		return;
 	}
-	GetAnimation()->Stop();
+	int animationId = PluginGetAnimationIdFromInstance(GetAnimation());
+	if (animationId >= 0)
+	{
+		PluginStopAnimation(animationId);
+	}
 }
 
 void EditorAnimationBase::SaveStream(FILE* stream)

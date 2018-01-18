@@ -120,6 +120,7 @@ private:
 	void AddFrame();
 	void SetPath(const std::string& path);
 	void SetAnimation(AnimationBase* animation);
+	void CloseAnimations();
 	void Reset();
 	std::vector<COLORREF> CreateColors1D();
 	std::vector<FChromaSDKColors> CreateColors2D();
