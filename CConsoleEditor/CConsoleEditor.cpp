@@ -1,10 +1,6 @@
 // CConsoleEditor.cpp : Defines the entry point for the console application.
 //
 
-//#define RUN_UNIT_TESTS true
-
-#define CHROMA_EDITOR_DLL _T("CChromaEditorLibrary.dll")
-
 #include "stdafx.h"
 #include <chrono>
 #include <thread>
@@ -12,7 +8,7 @@
 #include "..\CChromaEditorLibrary\ChromaSDKPluginTypes.h"
 
 typedef int(*PLUGIN_IS_INITIALIZED)();
-typedef int(*PLUGIN_IS_DIALOG_OPEN)();
+typedef bool(*PLUGIN_IS_DIALOG_OPEN)();
 typedef int(*PLUGIN_OPEN_EDITOR_DIALOG)(const char* path);
 typedef int(*PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)(const char* path);
 typedef int(*PLUGIN_OPEN_ANIMATION)(const char* path);
@@ -76,7 +72,7 @@ int Init()
 
 	fprintf(stderr, "Loaded Chroma Editor DLL!\r\n");
 
-	_gMethodIsInitialized = (PLUGIN_IS_DIALOG_OPEN)GetProcAddress(library, "PluginIsInitialized");
+	_gMethodIsInitialized = (PLUGIN_IS_INITIALIZED)GetProcAddress(library, "PluginIsInitialized");
 	if (_gMethodIsInitialized == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginIsInitialized!\r\n");
@@ -278,10 +274,12 @@ int main(int argc, char *argv[])
 		_gMethodOpenDialogAndPlay(argv[1]);
 	}
 
-	while (_gMethodIsDialogOpen())
+	bool isOpen;
+	do
 	{
+		isOpen = _gMethodIsDialogOpen();
 		Sleep(0);
-	}
+	} while (isOpen);
 
 	_gMethodUninit();
 	fprintf(stdout, "CConsoleEditor exited.\r\n");

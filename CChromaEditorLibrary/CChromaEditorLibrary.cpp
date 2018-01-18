@@ -82,12 +82,7 @@ CMainViewDlg::CMainViewDlg() : CDialogEx(IDD_MAIN_VIEW)
 
 CMainViewDlg::~CMainViewDlg()
 {
-	_mEditChromaLink.Stop();
-	_mEditHeadset.Stop();
-	_mEditKeyboard.Stop();
-	_mEditKeypad.Stop();
-	_mEditMouse.Stop();
-	_mEditMousepad.Stop();
+	OnBnClickedMenuExit();
 }
 
 void CMainViewDlg::OpenOrCreateAnimation(const std::string& path)
@@ -2114,8 +2109,12 @@ void CMainViewDlg::OnBnClickedMenuSaveAs()
 
 void CMainViewDlg::OnBnClickedMenuExit()
 {
-	// stop animation
-	OnBnClickedButtonStop();
+	_mEditChromaLink.Stop();
+	_mEditHeadset.Stop();
+	_mEditKeyboard.Stop();
+	_mEditKeypad.Stop();
+	_mEditMouse.Stop();
+	_mEditMousepad.Stop();
 
 	PostQuitMessage(0);
 }
