@@ -13,6 +13,55 @@ namespace ChromaSDK
 		_mAnimationMousepad = nullptr;
 	}
 
+	Animation1D* AnimationComposite::GetChromaLink()
+	{
+		return _mAnimationChromaLink;
+	}
+	Animation1D* AnimationComposite::GetHeadset()
+	{
+		return _mAnimationHeadset;
+	}
+	Animation2D* AnimationComposite::GetKeyboard()
+	{
+		return _mAnimationKeyboard;
+	}
+	Animation2D* AnimationComposite::GetKeypad()
+	{
+		return _mAnimationKeypad;
+	}
+	Animation2D* AnimationComposite::GetMouse()
+	{
+		return _mAnimationMouse;
+	}
+	Animation1D* AnimationComposite::GetMousepad()
+	{
+		return _mAnimationMousepad;
+	}
+	void AnimationComposite::SetChromaLink(Animation1D* animation)
+	{
+		_mAnimationChromaLink = animation;
+	}
+	void AnimationComposite::SetHeadset(Animation1D* animation)
+	{
+		_mAnimationHeadset = animation;
+	}
+	void AnimationComposite::SetKeyboard(Animation2D* animation)
+	{
+		_mAnimationKeyboard = animation;
+	}
+	void AnimationComposite::SetKeypad(Animation2D* animation)
+	{
+		_mAnimationKeypad = animation;
+	}
+	void AnimationComposite::SetMouse(Animation2D* animation)
+	{
+		_mAnimationMouse = animation;
+	}
+	void AnimationComposite::SetMousepad(Animation1D* animation)
+	{
+		_mAnimationMousepad = animation;
+	}
+
 	void AnimationComposite::Reset()
 	{
 		if (_mAnimationChromaLink != nullptr)
