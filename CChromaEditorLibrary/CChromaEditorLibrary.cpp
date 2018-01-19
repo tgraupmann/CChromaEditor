@@ -348,6 +348,11 @@ CButton* CMainViewDlg::GetControlUseKeyboardCustomKeys()
 	return (CButton*)GetDlgItem(IDC_CHECK_USE_KEYBOARD_CUSTOM_KEY_TYPE);
 }
 
+CSliderCtrl* CMainViewDlg::GetBrushSlider()
+{
+	return (CSliderCtrl*)GetDlgItem(IDC_SLIDER_BRUSH);
+}
+
 void CMainViewDlg::UpdateOverrideTime(float time)
 {
 	char buffer[10] = { 0 };
@@ -722,6 +727,9 @@ CButton* CMainViewDlg::GetEnabledButton()
 
 BOOL CMainViewDlg::OnInitDialog()
 {
+	_mBrushIntensitity = 1.0f;
+	GetBrushSlider()->SetPos(100);
+
 	LoadFile();
 
 	// setup dialog
@@ -948,7 +956,7 @@ BOOL CMainViewDlg::PreTranslateMessage(MSG* pMsg)
 				}
 				break;
 			default:
-				fprintf(stdout, "Pressed: %d\r\n", pMsg->wParam);
+				fprintf(stdout, "Pressed: %d\r\n", (int)pMsg->wParam);
 				break;
 			}
 		}
@@ -994,7 +1002,48 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_EXIT, &CMainViewDlg::OnBnClickedMenuExit)
 	ON_BN_CLICKED(ID_MENU_IMPORT_IMAGE, &CMainViewDlg::OnBnClickedMenuImportImage)
 	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
+	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
+
+void CMainViewDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	CSliderCtrl *ACSliderCtrl = (CSliderCtrl *)pScrollBar;
+	int nID = ACSliderCtrl->GetDlgCtrlID();
+	int newPos = ((CSliderCtrl *)pScrollBar)->GetPos();
+
+	switch (nID)
+	{
+	case IDC_SLIDER_BRUSH:
+		// Check what happened  
+		switch (nSBCode)
+		{
+		case TB_THUMBTRACK:
+			OnSliderBrushIntensity(nPos);
+			break;
+		}
+		break;
+	}
+}
+
+void CMainViewDlg::OnSliderBrushIntensity(UINT nPos)
+{
+	_mBrushIntensitity = nPos / 100.0f;
+
+	// temp copy
+	COLORREF color = _mColor;
+	int red = (color & 0xFF);
+	int green = (color & 0xFF00) >> 8;
+	int blue = (color & 0xFF0000) >> 16;
+
+	red = (int)(red * _mBrushIntensitity);
+	green = (int)(green * _mBrushIntensitity);
+	blue = (int)(blue * _mBrushIntensitity);
+
+	color = (red & 0xFF) | ((green << 8) & 0xFF00) | ((blue << 16) && 0xFF0000);
+
+	GetColorButtons()[0]->SetColor(color, color);
+	GetColorButtons()[0]->Invalidate();
+}
 
 vector<CColorButton*>& CMainViewDlg::GetGridButtons()
 {
@@ -1008,7 +1057,19 @@ vector<CColorButton*>& CMainViewDlg::GetColorButtons()
 
 COLORREF CMainViewDlg::GetColor()
 {
-	return _mColor;
+	// temp copy
+	COLORREF color = _mColor;
+	int red = (color & 0xFF);
+	int green = (color & 0xFF00) >> 8;
+	int blue = (color & 0xFF0000) >> 16;
+
+	red = (int)(red * _mBrushIntensitity);
+	green = (int)(green * _mBrushIntensitity);
+	blue = (int)(blue * _mBrushIntensitity);
+
+	color = (red & 0xFF) | ((green << 8) & 0xFF00) | ((blue << 16) && 0xFF0000);
+
+	return color;
 }
 
 void CMainViewDlg::SetColor(COLORREF color)
@@ -1416,7 +1477,7 @@ void CMainViewDlg::OnBnClickedButtonFill()
 			{
 				for (int i = 0; i < maxLeds; ++i)
 				{
-					frame1D.Colors[i] = _mColor;
+					frame1D.Colors[i] = GetColor();
 				}
 				SetCurrentFrame1D(frame1D);
 			}
@@ -1430,7 +1491,7 @@ void CMainViewDlg::OnBnClickedButtonFill()
 					FChromaSDKColors& row = frame2D.Colors[i];
 					for (int j = 0; j < maxColumn; ++j)
 					{
-						row.Colors[j] = _mColor;
+						row.Colors[j] = GetColor();
 					}
 				}
 				SetCurrentFrame2D(frame2D);
@@ -1804,7 +1865,7 @@ void CMainViewDlg::OnBnClickedButtonSetKey()
 			int id = GetControlSetKeyCombo()->GetCurSel();
 			EChromaSDKKeyboardKey key = (EChromaSDKKeyboardKey)id;
 			std::vector<FChromaSDKColors>& colors = frame.Colors;
-			ChromaSDKPlugin::GetInstance()->SetKeyboardKeyColor(key, _mColor, colors);
+			ChromaSDKPlugin::GetInstance()->SetKeyboardKeyColor(key, GetColor(), colors);
 			RefreshGrid();
 		}
 	}
@@ -1827,7 +1888,7 @@ void CMainViewDlg::OnBnClickedButtonSetLed()
 			int id = GetControlSetLEDCombo()->GetCurSel();
 			EChromaSDKMouseLED led = (EChromaSDKMouseLED)id;
 			std::vector<FChromaSDKColors>& colors = frame.Colors;
-			ChromaSDKPlugin::GetInstance()->SetMouseLEDColor(led, _mColor, colors);
+			ChromaSDKPlugin::GetInstance()->SetMouseLEDColor(led, GetColor(), colors);
 			RefreshGrid();
 		}
 	}

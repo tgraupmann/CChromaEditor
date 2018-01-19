@@ -95,6 +95,10 @@ public:
 	afx_msg void OnBnClickedButtonLoop();
 	afx_msg void OnBnClickedButtonEnable();
 	afx_msg void OnSelChangeListTypes();
+	
+	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+
+	void OnSliderBrushIntensity(UINT nPos);
 
 	void OnBnClickedButtonColor(UINT nID);
 
@@ -148,6 +152,7 @@ private:
 	CStatic* GetControlFrames();
 	CEdit* GetControlDuration();
 	CButton* GetControlUseKeyboardCustomKeys();
+	CSliderCtrl* GetBrushSlider();
 
 	void UpdateOverrideTime(float time);
 	float GetOverrideTime();
@@ -185,4 +190,6 @@ private:
 
 	// keyboard input
 	bool _mControlModifier;
+
+	float _mBrushIntensitity;
 };
