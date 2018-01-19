@@ -341,24 +341,28 @@ void DebugUnitTests()
 		fprintf(stdout, "Play blank animation\r\n");
 		const char* fileBlank = "Blank_Keyboard.chroma";
 		_gMethodPlayAnimationName(fileBlank, false);
-		Sleep(500);
+		Sleep(100);
 
 		fprintf(stdout, "Play composite animation\r\n");
 		const char* fileAnimation = "Composite.chroma";
 		_gMethodPlayAnimationName(fileAnimation, false);
-		Sleep(500);
+		Sleep(100);
 
 		fprintf(stdout, "Play composite animation\r\n");
 		_gMethodPlayAnimationName(fileAnimation, false);
-		Sleep(500);
+		Sleep(100);
 
 		fprintf(stdout, "Stop composite animation\r\n");
 		_gMethodStopAnimationName(fileAnimation);
-		Sleep(500);
+		Sleep(100);
 
 		fprintf(stdout, "Close composite animation\r\n");
 		_gMethodCloseAnimationName(fileAnimation);
-		Sleep(3000);
+		Sleep(100);
+
+		fprintf(stdout, "Play composite animation looping\r\n");
+		_gMethodPlayAnimationName(fileAnimation, true);
+		Sleep(100);
 
 		fprintf(stdout, "Other tests\r\n");
 		fileAnimation = "Random_Keyboard.chroma";

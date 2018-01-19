@@ -14,42 +14,12 @@ namespace ChromaSDK
 	}
 	AnimationComposite::~AnimationComposite()
 	{
-		if (_mAnimationChromaLink != nullptr)
-		{
-			_mAnimationChromaLink->Stop();
-			_mAnimationChromaLink->Unload();
-			delete _mAnimationChromaLink;
-		}
-		if (_mAnimationHeadset != nullptr)
-		{
-			_mAnimationHeadset->Stop();
-			_mAnimationHeadset->Unload();
-			delete _mAnimationHeadset;
-		}
-		if (_mAnimationKeyboard != nullptr)
-		{
-			_mAnimationKeyboard->Stop();
-			_mAnimationKeyboard->Unload();
-			delete _mAnimationKeyboard;
-		}
-		if (_mAnimationKeypad != nullptr)
-		{
-			_mAnimationKeypad->Stop();
-			_mAnimationKeypad->Unload();
-			delete _mAnimationKeypad;
-		}
-		if (_mAnimationMouse != nullptr)
-		{
-			_mAnimationMouse->Stop();
-			_mAnimationMouse->Unload();
-			delete _mAnimationMouse;
-		}
-		if (_mAnimationMousepad != nullptr)
-		{
-			_mAnimationMousepad->Stop();
-			_mAnimationMousepad->Unload();
-			delete _mAnimationMousepad;
-		}
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationChromaLink));
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationHeadset));
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeyboard));
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeypad));
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMouse));
+		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMousepad));
 	}
 	Animation1D* AnimationComposite::GetChromaLink()
 	{
@@ -227,6 +197,40 @@ namespace ChromaSDK
 		if (_mAnimationMousepad != nullptr)
 		{
 			_mAnimationMousepad->Play(loop);
+		}
+	}
+
+	bool AnimationComposite::IsPlaying()
+	{
+		if (_mAnimationChromaLink != nullptr &&
+			_mAnimationChromaLink->IsPlaying())
+		{
+			return true;
+		}
+		if (_mAnimationHeadset != nullptr &&
+			_mAnimationHeadset->IsPlaying())
+		{
+			return true;
+		}
+		if (_mAnimationKeyboard != nullptr &&
+			_mAnimationKeyboard->IsPlaying())
+		{
+			return true;
+		}
+		if (_mAnimationKeypad != nullptr &&
+			_mAnimationKeypad->IsPlaying())
+		{
+			return true;
+		}
+		if (_mAnimationMouse != nullptr &&
+			_mAnimationMouse->IsPlaying())
+		{
+			return true;
+		}
+		if (_mAnimationMousepad != nullptr &&
+			_mAnimationMousepad->IsPlaying())
+		{
+			return true;
 		}
 	}
 

@@ -217,6 +217,16 @@ extern "C"
 		return PluginOpenEditorDialogAndPlay(path);
 	}
 
+	int RegisterAnimation(const char* path, AnimationBase* animation)
+	{
+		animation->SetName(path);
+		int id = _gAnimationId;
+		_gAnimations[id] = animation;
+		++_gAnimationId;
+		_gAnimationMapID[path] = id;
+		return id;
+	}
+
 	EXPORT_API int PluginOpenAnimation(const char* path)
 	{
 		try
@@ -274,6 +284,9 @@ extern "C"
 						case EChromaSDKDevice1DEnum::DE_ChromaLink:
 							if (composite->GetChromaLink() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_ChromaLink";
+								RegisterAnimation(strPath.c_str(), animation1D);
 								composite->SetChromaLink(animation1D);
 							}
 							else
@@ -284,6 +297,9 @@ extern "C"
 						case EChromaSDKDevice1DEnum::DE_Headset:
 							if (composite->GetHeadset() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_Headset";
+								RegisterAnimation(strPath.c_str(), animation1D);
 								composite->SetHeadset(animation1D);
 							}
 							else
@@ -294,6 +310,9 @@ extern "C"
 						case EChromaSDKDevice1DEnum::DE_Mousepad:
 							if (composite->GetMousepad() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_Mousepad";
+								RegisterAnimation(strPath.c_str(), animation1D);
 								composite->SetMousepad(animation1D);
 							}
 							else
@@ -310,6 +329,9 @@ extern "C"
 						case EChromaSDKDevice2DEnum::DE_Keyboard:
 							if (composite->GetKeyboard() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_Keyboard";
+								RegisterAnimation(strPath.c_str(), animation2D);
 								composite->SetKeyboard(animation2D);
 							}
 							else
@@ -320,6 +342,9 @@ extern "C"
 						case EChromaSDKDevice2DEnum::DE_Keypad:
 							if (composite->GetKeypad() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_Keypad";
+								RegisterAnimation(strPath.c_str(), animation2D);
 								composite->SetKeypad(animation2D);
 							}
 							else
@@ -330,6 +355,9 @@ extern "C"
 						case EChromaSDKDevice2DEnum::DE_Mouse:
 							if (composite->GetMouse() == nullptr)
 							{
+								string strPath = path;
+								strPath += "_Mouse";
+								RegisterAnimation(strPath.c_str(), animation2D);
 								composite->SetMouse(animation2D);
 							}
 							else
@@ -343,12 +371,7 @@ extern "C"
 				}
 				animation = composite;
 			}
-			animation->SetName(path);
-			int id = _gAnimationId;
-			_gAnimations[id] = animation;
-			++_gAnimationId;
-			_gAnimationMapID[path] = id;
-			return id;
+			return RegisterAnimation(path, animation);
 		}
 		catch (exception)
 		{
@@ -371,7 +394,7 @@ extern "C"
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginLoadAnimation: Animation is null! id=%d", animationId);
+					LogError("PluginLoadAnimation: Animation is null! id=%d\r\n", animationId);
 					return -1;
 				}
 				animation->Load();
@@ -399,7 +422,7 @@ extern "C"
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginUnloadAnimation: Animation is null! id=%d", animationId);
+					LogError("PluginUnloadAnimation: Animation is null! id=%d\r\n", animationId);
 					return -1;
 				}
 				animation->Unload();
@@ -436,7 +459,7 @@ extern "C"
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginPlayAnimation: Animation is null! id=%d", animationId);
+					LogError("PluginPlayAnimation: Animation is null! id=%d\r\n", animationId);
 					return -1;
 				}
 				PluginStopAnimationType(animation->GetDeviceTypeId(), animation->GetDeviceId());
@@ -474,7 +497,7 @@ extern "C"
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginIsPlaying: Animation is null! id=%d", animationId);
+					LogError("PluginIsPlaying: Animation is null! id=%d\r\n", animationId);
 					return false;
 				}
 				return animation->IsPlaying();
@@ -508,7 +531,7 @@ extern "C"
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginStopAnimation: Animation is null! id=%d", animationId);
+					LogError("PluginStopAnimation: Animation is null! id=%d\r\n", animationId);
 					return -1;
 				}
 				animation->Stop();
@@ -531,12 +554,17 @@ extern "C"
 	{
 		try
 		{
+			if (animationId < 0)
+			{
+				LogError("PluginCloseAnimation: Invalid animationId=%d\r\n", animationId);
+				return -1;
+			}
 			if (_gAnimations.find(animationId) != _gAnimations.end())
 			{
 				AnimationBase* animation = _gAnimations[animationId];
 				if (animation == nullptr)
 				{
-					LogError("PluginCloseAnimation: Animation is null! id=%d", animationId);
+					LogError("PluginCloseAnimation: Animation is null! id=%d\r\n", animationId);
 					return -1;
 				}
 				animation->Stop();
@@ -569,7 +597,7 @@ extern "C"
 		}
 		catch (exception)
 		{
-			LogError("PluginCloseAnimation: Exception animationId=%d\r\n", (int)animationId);
+			LogError("PluginCloseAnimation: Exception animationId=%d\r\n", animationId);
 		}
 		return -1;
 	}
@@ -676,7 +704,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginSaveAnimation: Animation is null! id=%d", animationId);
+				LogError("PluginSaveAnimation: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			animation->Save(path);
@@ -694,7 +722,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginResetAnimation: Animation is null! id=%d", animationId);
+				LogError("PluginResetAnimation: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			animation->ResetFrames();
@@ -709,7 +737,7 @@ extern "C"
 		AnimationBase* animation = GetAnimationInstance(animationId);
 		if (nullptr == animation)
 		{
-			LogError("PluginGetFrameCount: Animation is null! id=%d", animationId);
+			LogError("PluginGetFrameCount: Animation is null! id=%d\r\n", animationId);
 			return -1;
 		}
 		return animation->GetFrameCount();
@@ -736,7 +764,7 @@ extern "C"
 		AnimationBase* animation = GetAnimationInstance(animationId);
 		if (nullptr == animation)
 		{
-			LogError("PluginGetCurrentFrame: Animation is null! id=%d", animationId);
+			LogError("PluginGetCurrentFrame: Animation is null! id=%d\r\n", animationId);
 			return -1;
 		}
 		return animation->GetCurrentFrame();
@@ -765,7 +793,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginGetDeviceType: Animation is null! id=%d", animationId);
+				LogError("PluginGetDeviceType: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			return (int)animation->GetDeviceType();
@@ -797,7 +825,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginGetDevice: Animation is null! id=%d", animationId);
+				LogError("PluginGetDevice: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -843,7 +871,7 @@ extern "C"
 		AnimationBase* animation = GetAnimationInstance(animationId);
 		if (nullptr == animation)
 		{
-			LogError("PluginSetDevice: Animation is null! id=%d", animationId);
+			LogError("PluginSetDevice: Animation is null! id=%d\r\n", animationId);
 			return -1;
 		}
 		string path = animation->GetName();
@@ -890,7 +918,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginAddFrame: Animation is null! id=%d", animationId);
+				LogError("PluginAddFrame: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -964,7 +992,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginUpdateFrame: Animation is null! id=%d", animationId);
+				LogError("PluginUpdateFrame: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1046,7 +1074,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginGetFrame: Animation is null! id=%d", animationId);
+				LogError("PluginGetFrame: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1123,7 +1151,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginPreviewFrame: Animation is null! id=%d", animationId);
+				LogError("PluginPreviewFrame: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1199,7 +1227,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginOverrideFrameDuration: Animation is null! id=%d", animationId);
+				LogError("PluginOverrideFrameDuration: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1261,7 +1289,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginReverse: Animation is null! id=%d", animationId);
+				LogError("PluginReverse: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1318,7 +1346,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginMirrorHorizontally: Animation is null! id=%d", animationId);
+				LogError("PluginMirrorHorizontally: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1383,7 +1411,7 @@ extern "C"
 			AnimationBase* animation = _gAnimations[animationId];
 			if (animation == nullptr)
 			{
-				LogError("PluginMirrorVertically: Animation is null! id=%d", animationId);
+				LogError("PluginMirrorVertically: Animation is null! id=%d\r\n", animationId);
 				return -1;
 			}
 			switch (animation->GetDeviceType())
@@ -1419,6 +1447,11 @@ extern "C"
 
 	int PluginGetAnimationIdFromInstance(AnimationBase* animation)
 	{
+		if (animation == nullptr)
+		{
+			fprintf(stderr, "PluginGetAnimationIdFromInstance: Invalid animation!\r\n");
+			return -1;
+		}
 		for (int index = 0; index < _gAnimations.size(); ++index)
 		{
 			if (_gAnimations[index] == animation)
@@ -1493,6 +1526,7 @@ extern "C"
 			}
 			PluginStopAnimationType(animation->GetDeviceType(), animation->GetDeviceId());
 			//LogDebug("PluginPlayAnimationLoop: %s\r\n", animation->GetName().c_str());
+			AnimationComposite* composite;
 			switch (animation->GetDeviceType())
 			{
 			case EChromaSDKDeviceTypeEnum::DE_1D:
@@ -1500,6 +1534,33 @@ extern "C"
 				break;
 			case EChromaSDKDeviceTypeEnum::DE_2D:
 				_gPlayMap2D[(EChromaSDKDevice2DEnum)animation->GetDeviceId()] = animationId;
+				break;
+			case EChromaSDKDeviceTypeEnum::DE_Composite:
+				composite = (AnimationComposite*)animation;
+				if (composite->GetChromaLink() != nullptr)
+				{
+					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_ChromaLink] = PluginGetAnimationIdFromInstance(composite->GetChromaLink());
+				}
+				if (composite->GetHeadset() != nullptr)
+				{
+					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_Headset] = PluginGetAnimationIdFromInstance(composite->GetHeadset());
+				}
+				if (composite->GetKeyboard() != nullptr)
+				{
+					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Keyboard] = PluginGetAnimationIdFromInstance(composite->GetKeyboard());
+				}
+				if (composite->GetKeypad() != nullptr)
+				{
+					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Keypad] = PluginGetAnimationIdFromInstance(composite->GetKeypad());
+				}
+				if (composite->GetMouse() != nullptr)
+				{
+					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Mouse] = PluginGetAnimationIdFromInstance(composite->GetMouse());
+				}
+				if (composite->GetMousepad() != nullptr)
+				{
+					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_Mousepad] = PluginGetAnimationIdFromInstance(composite->GetMousepad());
+				}
 				break;
 			}
 			animation->Play(loop);

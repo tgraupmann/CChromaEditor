@@ -20,7 +20,7 @@ namespace ChromaSDK
 		virtual void Play(bool loop) = 0;
 		virtual void Pause() = 0;
 		virtual void Resume(bool loop) = 0;
-		bool IsPlaying();
+		virtual bool IsPlaying();
 		bool IsPaused();
 		bool HasLoop();
 		virtual void Load() = 0;

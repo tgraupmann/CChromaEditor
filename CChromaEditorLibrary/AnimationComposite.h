@@ -29,6 +29,7 @@ namespace ChromaSDK
 		void Load();
 		void Unload();
 		void Play(bool loop);
+		virtual bool IsPlaying();
 		void Pause();
 		void Resume(bool loop);
 		void Stop();
