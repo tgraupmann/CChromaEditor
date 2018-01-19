@@ -196,20 +196,28 @@ void CMainViewDlg::LoadFile()
 						selectedAnimation = animation;
 					}
 
+					string strPath = _mPath;
+
 					switch (animation->GetDeviceType())
 					{
 						case EChromaSDKDeviceTypeEnum::DE_1D:
 							switch (((Animation1D*)animation)->GetDevice())
 							{
 							case EChromaSDKDevice1DEnum::DE_ChromaLink:
+								strPath += "_ChromaLink";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditChromaLink.SetAnimation(animation);
 								_mEditChromaLink.Reset();
 								break;
 							case EChromaSDKDevice1DEnum::DE_Headset:
+								strPath += "_Headset";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditHeadset.SetAnimation(animation);
 								_mEditHeadset.Reset();
 								break;
 							case EChromaSDKDevice1DEnum::DE_Mousepad:
+								strPath += "_Mousepad";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditMousepad.SetAnimation(animation);
 								_mEditMousepad.Reset();
 								break;
@@ -219,14 +227,20 @@ void CMainViewDlg::LoadFile()
 							switch (((Animation2D*)animation)->GetDevice())
 							{
 							case EChromaSDKDevice2DEnum::DE_Keyboard:
+								strPath += "_Keyboard";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditKeyboard.SetAnimation(animation);
 								_mEditKeyboard.Reset();
 								break;
 							case EChromaSDKDevice2DEnum::DE_Keypad:
+								strPath += "_Keypad";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditKeypad.SetAnimation(animation);
 								_mEditKeypad.Reset();
 								break;
 							case EChromaSDKDevice2DEnum::DE_Mouse:
+								strPath += "_Mouse";
+								RegisterAnimation(strPath.c_str(), animation);
 								_mEditMouse.SetAnimation(animation);
 								_mEditMouse.Reset();
 								break;
@@ -1650,7 +1664,12 @@ void CMainViewDlg::OnBnClickedButtonPlay()
 {
 	if (GetAnimation() != nullptr)
 	{
-		GetAnimation()->Play(false);
+		int animationId = PluginGetAnimationIdFromInstance(GetAnimation());
+		if (animationId < 0)
+		{
+			return;
+		}
+		PluginPlayAnimationLoop(animationId, false);
 	}
 }
 
@@ -1733,7 +1752,12 @@ void CMainViewDlg::OnBnClickedButtonLoop()
 {
 	if (GetAnimation() != nullptr)
 	{
-		GetAnimation()->Play(true);
+		int animationId = PluginGetAnimationIdFromInstance(GetAnimation());
+		if (animationId < 0)
+		{
+			return;
+		}
+		PluginPlayAnimationLoop(animationId, true);
 	}
 }
 

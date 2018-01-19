@@ -50,6 +50,8 @@ void LogError(const char* text, ...);
 
 #include "AnimationBase.h"
 
+int RegisterAnimation(const char* path, ChromaSDK::AnimationBase* animation);
+
 extern "C"
 {
 	//GameMaker: Only has double and char* types

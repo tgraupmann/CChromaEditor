@@ -105,6 +105,16 @@ void ThreadOpenEditorDialog(bool playOnOpen)
 	_gDialogIsOpen = false;
 }
 
+int RegisterAnimation(const char* path, AnimationBase* animation)
+{
+	animation->SetName(path);
+	int id = _gAnimationId;
+	_gAnimations[id] = animation;
+	++_gAnimationId;
+	_gAnimationMapID[path] = id;
+	return id;
+}
+
 extern "C"
 {
 	EXPORT_API void PluginSetLogDelegate(DebugLogPtr fp)
@@ -215,16 +225,6 @@ extern "C"
 	EXPORT_API double PluginOpenEditorDialogAndPlayD(const char* path)
 	{
 		return PluginOpenEditorDialogAndPlay(path);
-	}
-
-	int RegisterAnimation(const char* path, AnimationBase* animation)
-	{
-		animation->SetName(path);
-		int id = _gAnimationId;
-		_gAnimations[id] = animation;
-		++_gAnimationId;
-		_gAnimationMapID[path] = id;
-		return id;
 	}
 
 	EXPORT_API int PluginOpenAnimation(const char* path)
