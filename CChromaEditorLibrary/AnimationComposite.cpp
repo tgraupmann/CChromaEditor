@@ -327,4 +327,25 @@ namespace ChromaSDK
 		}
 		return -1;
 	}
+	//???
+	EChromaSDKDeviceTypeEnum AnimationComposite::GetDeviceType()
+	{
+		return EChromaSDKDeviceTypeEnum::DE_Composite;
+	}
+	int AnimationComposite::GetDeviceId()
+	{
+		return -1;
+	}
+	void AnimationComposite::ResetFrames()
+	{
+
+	}
+	int AnimationComposite::GetFrameCount()
+	{
+		return 0;
+	}
+	void AnimationComposite::SaveStream(FILE* stream)
+	{
+
+	}
 }

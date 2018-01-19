@@ -32,6 +32,12 @@ namespace ChromaSDK
 		void Stop();
 		void Update(float deltaTime);
 		int Save(const char* path);
+		// ???
+		virtual EChromaSDKDeviceTypeEnum GetDeviceType();
+		virtual int GetDeviceId();
+		virtual void ResetFrames();
+		virtual int GetFrameCount();
+		virtual void SaveStream(FILE* stream);
 	private:
 		Animation1D* _mAnimationChromaLink;
 		Animation1D* _mAnimationHeadset;

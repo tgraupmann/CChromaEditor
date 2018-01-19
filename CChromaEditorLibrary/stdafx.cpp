@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "CChromaEditorLibrary.h"
 #include "ChromaThread.h"
+#include "AnimationComposite.h"
 #include <map>
 #include <sstream>
 #include <thread>
@@ -220,22 +221,134 @@ extern "C"
 	{
 		try
 		{
-			//return animation id
-			AnimationBase* animation = ChromaSDKPlugin::GetInstance()->OpenAnimation(path);
-			if (animation == nullptr)
+			AnimationBase* animation = nullptr;
+
+			LogDebug("PluginOpenAnimation: %s\r\n", path);
+			FILE* stream = nullptr;
+			if (0 != fopen_s(&stream, path, "rb") ||
+				stream == nullptr)
 			{
-				LogError("PluginOpenAnimation: Animation is null! name=%s\r\n", path);
+				LogError("PluginOpenAnimation: Failed to open animation! %s\r\n", path);
 				return -1;
 			}
+
+			vector<AnimationBase*> animations = vector<AnimationBase*>();
+			do
+			{
+				animation = ChromaSDKPlugin::GetInstance()->OpenAnimationStream(stream);
+				if (animation != nullptr)
+				{
+					animations.push_back(animation);
+				}
+			} while (animation != nullptr);
+
+			std::fclose(stream);
+			LogDebug("PluginOpenAnimation: Loaded %s\r\n", path);
+
+			// no animations in file
+			if (animations.size() == 0)
+			{
+				LogError("PluginOpenAnimation: Animation is missing! name=%s\r\n", path);
+				return -1;
+			}
+			// single animation file
+			else if (animations.size() == 1)
+			{
+				animation = animations[0];
+			}
+			// composite animation
 			else
 			{
-				animation->SetName(path);
-				int id = _gAnimationId;
-				_gAnimations[id] = animation;
-				++_gAnimationId;
-				_gAnimationMapID[path] = id;
-				return id;
+				AnimationComposite* composite = new AnimationComposite();
+				Animation1D* animation1D;
+				Animation2D* animation2D;
+				for (int i = 0; i < animations.size(); ++i)
+				{
+					animation = animations[i];
+					switch (animation->GetDeviceType())
+					{
+					case EChromaSDKDeviceTypeEnum::DE_1D:
+						animation1D = (Animation1D*)animation;
+						switch (animation1D->GetDevice())
+						{
+						case EChromaSDKDevice1DEnum::DE_ChromaLink:
+							if (composite->GetChromaLink() == nullptr)
+							{
+								composite->SetChromaLink(animation1D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						case EChromaSDKDevice1DEnum::DE_Headset:
+							if (composite->GetHeadset() == nullptr)
+							{
+								composite->SetHeadset(animation1D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						case EChromaSDKDevice1DEnum::DE_Mousepad:
+							if (composite->GetMousepad() == nullptr)
+							{
+								composite->SetMousepad(animation1D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						}
+						break;
+					case EChromaSDKDeviceTypeEnum::DE_2D:
+						animation2D = (Animation2D*)animation;
+						switch (animation2D->GetDevice())
+						{
+						case EChromaSDKDevice2DEnum::DE_Keyboard:
+							if (composite->GetKeyboard() == nullptr)
+							{
+								composite->SetKeyboard(animation2D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						case EChromaSDKDevice2DEnum::DE_Keypad:
+							if (composite->GetKeypad() == nullptr)
+							{
+								composite->SetKeypad(animation2D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						case EChromaSDKDevice2DEnum::DE_Mouse:
+							if (composite->GetMouse() == nullptr)
+							{
+								composite->SetMouse(animation2D);
+							}
+							else
+							{
+								delete animation;
+							}
+							break;
+						}
+						break;
+					}
+				}
+				animation = composite;
 			}
+			animation->SetName(path);
+			int id = _gAnimationId;
+			_gAnimations[id] = animation;
+			++_gAnimationId;
+			_gAnimationMapID[path] = id;
+			return id;
 		}
 		catch (exception)
 		{
@@ -1507,30 +1620,34 @@ extern "C"
 		switch ((EChromaSDKDeviceTypeEnum)deviceType)
 		{
 		case EChromaSDKDeviceTypeEnum::DE_1D:
+			if (_gPlayMap1D.find((EChromaSDKDevice1DEnum)device) != _gPlayMap1D.end())
 			{
-				if (_gPlayMap1D.find((EChromaSDKDevice1DEnum)device) != _gPlayMap1D.end())
+				int prevAnimation = _gPlayMap1D[(EChromaSDKDevice1DEnum)device];
+				if (prevAnimation != -1)
 				{
-					int prevAnimation = _gPlayMap1D[(EChromaSDKDevice1DEnum)device];
-					if (prevAnimation != -1)
-					{
-						PluginStopAnimation(prevAnimation);
-						_gPlayMap1D[(EChromaSDKDevice1DEnum)device] = -1;
-					}
+					PluginStopAnimation(prevAnimation);
+					_gPlayMap1D[(EChromaSDKDevice1DEnum)device] = -1;
 				}
 			}
 			break;
 		case EChromaSDKDeviceTypeEnum::DE_2D:
+			if (_gPlayMap2D.find((EChromaSDKDevice2DEnum)device) != _gPlayMap2D.end())
 			{
-				if (_gPlayMap2D.find((EChromaSDKDevice2DEnum)device) != _gPlayMap2D.end())
+				int prevAnimation = _gPlayMap2D[(EChromaSDKDevice2DEnum)device];
+				if (prevAnimation != -1)
 				{
-					int prevAnimation = _gPlayMap2D[(EChromaSDKDevice2DEnum)device];
-					if (prevAnimation != -1)
-					{
-						PluginStopAnimation(prevAnimation);
-						_gPlayMap2D[(EChromaSDKDevice2DEnum)device] = -1;
-					}
+					PluginStopAnimation(prevAnimation);
+					_gPlayMap2D[(EChromaSDKDevice2DEnum)device] = -1;
 				}
 			}
+			break;
+		case EChromaSDKDeviceTypeEnum::DE_Composite:
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
+			PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
 			break;
 		}
 	}

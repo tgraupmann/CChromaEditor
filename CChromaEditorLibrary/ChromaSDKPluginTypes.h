@@ -28,6 +28,7 @@ namespace ChromaSDK
 	{
 		DE_1D = 0,
 		DE_2D,
+		DE_Composite,
 	};
 
 	enum EChromaSDKDeviceEnum

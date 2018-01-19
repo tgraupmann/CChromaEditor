@@ -353,6 +353,10 @@ void DebugUnitTests()
 		const char* fileAnimation = "Composite.chroma";
 		_gMethodPlayAnimationName(fileAnimation, false);
 		Sleep(3000);
+		_gMethodPlayAnimationName(fileAnimation, false);
+		Sleep(3000);
+		_gMethodPlayAnimationName(fileAnimation, false);
+		Sleep(500);
 		int animationId =_gMethodOpenAnimationWithType(fileAnimation, (int)EChromaSDKDeviceEnum::EDIT_Keyboard);
 		if (animationId >= 0)
 		{
