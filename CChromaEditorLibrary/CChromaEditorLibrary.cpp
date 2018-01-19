@@ -338,6 +338,11 @@ CStatic* CMainViewDlg::GetControlFrames()
 	return (CStatic*)GetDlgItem(IDC_STATIC_FRAMES);
 }
 
+CEdit* CMainViewDlg::GetControlFrameIndex()
+{
+	return (CEdit*)GetDlgItem(IDC_EDIT_FRAME_INDEX);
+}
+
 CEdit* CMainViewDlg::GetControlDuration()
 {
 	return (CEdit*)GetDlgItem(IDC_EDIT_DURATION);
@@ -669,6 +674,9 @@ void CMainViewDlg::RefreshFrames()
 
 	sprintf_s(bufferFrameInfo, "%d of %d", currentFrame + 1, frameCount);
 	GetControlFrames()->SetWindowText(CString(bufferFrameInfo));
+
+	sprintf_s(bufferFrameInfo, "%d", currentFrame + 1);
+	GetControlFrameIndex()->SetWindowText(CString(bufferFrameInfo));
 
 	//update the frame duration
 	char bufferDuration[16] = { 0 };

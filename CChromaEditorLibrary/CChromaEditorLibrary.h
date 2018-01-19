@@ -150,6 +150,7 @@ private:
 	CComboBox* GetControlSetLEDCombo();
 	CButton* GetControlSetLEDButton();
 	CStatic* GetControlFrames();
+	CEdit* GetControlFrameIndex();
 	CEdit* GetControlDuration();
 	CButton* GetControlUseKeyboardCustomKeys();
 	CSliderCtrl* GetBrushSlider();
