@@ -12,7 +12,45 @@ namespace ChromaSDK
 		_mAnimationMouse = nullptr;
 		_mAnimationMousepad = nullptr;
 	}
-
+	AnimationComposite::~AnimationComposite()
+	{
+		if (_mAnimationChromaLink != nullptr)
+		{
+			_mAnimationChromaLink->Stop();
+			_mAnimationChromaLink->Unload();
+			delete _mAnimationChromaLink;
+		}
+		if (_mAnimationHeadset != nullptr)
+		{
+			_mAnimationHeadset->Stop();
+			_mAnimationHeadset->Unload();
+			delete _mAnimationHeadset;
+		}
+		if (_mAnimationKeyboard != nullptr)
+		{
+			_mAnimationKeyboard->Stop();
+			_mAnimationKeyboard->Unload();
+			delete _mAnimationKeyboard;
+		}
+		if (_mAnimationKeypad != nullptr)
+		{
+			_mAnimationKeypad->Stop();
+			_mAnimationKeypad->Unload();
+			delete _mAnimationKeypad;
+		}
+		if (_mAnimationMouse != nullptr)
+		{
+			_mAnimationMouse->Stop();
+			_mAnimationMouse->Unload();
+			delete _mAnimationMouse;
+		}
+		if (_mAnimationMousepad != nullptr)
+		{
+			_mAnimationMousepad->Stop();
+			_mAnimationMousepad->Unload();
+			delete _mAnimationMousepad;
+		}
+	}
 	Animation1D* AnimationComposite::GetChromaLink()
 	{
 		return _mAnimationChromaLink;
@@ -36,6 +74,24 @@ namespace ChromaSDK
 	Animation1D* AnimationComposite::GetMousepad()
 	{
 		return _mAnimationMousepad;
+	}
+	AnimationBase* AnimationComposite::GetAnimation(EChromaSDKDeviceTypeEnum device)
+	{
+		switch (device)
+		{
+		case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+			return GetChromaLink();
+		case EChromaSDKDeviceEnum::EDIT_Headset:
+			return GetHeadset();
+		case EChromaSDKDeviceEnum::EDIT_Keyboard:
+			return GetKeyboard();
+		case EChromaSDKDeviceEnum::EDIT_Keypad:
+			return GetKeypad();
+		case EChromaSDKDeviceEnum::EDIT_Mouse:
+			return GetMouse();
+		case EChromaSDKDeviceEnum::EDIT_Mousepad:
+			return GetMousepad();
+		}
 	}
 	void AnimationComposite::SetChromaLink(Animation1D* animation)
 	{

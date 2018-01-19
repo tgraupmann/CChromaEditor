@@ -11,12 +11,14 @@ namespace ChromaSDK
 	{
 	public:
 		AnimationComposite();
+		~AnimationComposite();
 		Animation1D* GetChromaLink();
 		Animation1D* GetHeadset();
 		Animation2D* GetKeyboard();
 		Animation2D* GetKeypad();
 		Animation2D* GetMouse();
 		Animation1D* GetMousepad();
+		AnimationBase* GetAnimation(EChromaSDKDeviceTypeEnum device);
 		void SetChromaLink(Animation1D* animation);
 		void SetHeadset(Animation1D* animation);
 		void SetKeyboard(Animation2D* animation);

@@ -362,41 +362,6 @@ extern "C"
 		return PluginOpenAnimation(path);
 	}
 
-	EXPORT_API int PluginOpenAnimationWithType(const char* path, int device)
-	{
-		try
-		{
-			//return animation id
-			AnimationBase* animation = ChromaSDKPlugin::GetInstance()->OpenAnimationWithType(path, (EChromaSDKDeviceEnum)device);
-			if (animation == nullptr)
-			{
-				LogError("PluginOpenAnimationWithType: Animation is null! name=%s\r\n", path);
-				return -1;
-			}
-			else
-			{
-				string strPath = path;
-				// add path_Keyboard.chroma
-				animation->SetName(path);
-				int id = _gAnimationId;
-				_gAnimations[id] = animation;
-				++_gAnimationId;
-				_gAnimationMapID[path] = id;
-				return id;
-			}
-		}
-		catch (exception)
-		{
-			LogError("PluginOpenAnimationWithType: Exception path=%s\r\n", path);
-			return -1;
-		}
-	}
-
-	EXPORT_API double PluginOpenAnimationWithTypeD(const char* path, double device)
-	{
-		return (double)PluginOpenAnimationWithType(path, (int)device);
-	}
-
 	EXPORT_API int PluginLoadAnimation(int animationId)
 	{
 		try
@@ -580,7 +545,24 @@ extern "C"
 				{
 					_gAnimationMapID.erase(animationName);
 				}
-				delete _gAnimations[animationId];
+				Animation1D* animation1D;
+				Animation2D* animation2D;
+				AnimationComposite* composite;
+				switch (animation->GetDeviceType())
+				{
+				case EChromaSDKDeviceTypeEnum::DE_1D:
+					animation1D = (Animation1D*)animation;
+					delete animation1D;
+					break;
+				case EChromaSDKDeviceTypeEnum::DE_2D:
+					animation2D = (Animation2D*)animation;
+					delete animation2D;
+					break;
+				case EChromaSDKDeviceTypeEnum::DE_Composite:
+					composite = (AnimationComposite*)animation;
+					delete composite;
+					break;
+				}
 				_gAnimations.erase(animationId);
 				return animationId;
 			}

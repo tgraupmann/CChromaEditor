@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Animation1D.h"
 #include "Animation2D.h"
+#include "AnimationComposite.h"
 #include "ChromaSDKPlugin.h"
 
 #ifdef _WIN64
@@ -1435,82 +1436,6 @@ AnimationBase* ChromaSDKPlugin::OpenAnimation(const string& path)
 
 		std::fclose(stream);
 		LogDebug("OpenAnimation: Loaded %s\r\n", path.c_str());
-	}
-
-	return animation;
-}
-
-AnimationBase* ChromaSDKPlugin::OpenAnimationWithType(const string& path, EChromaSDKDeviceEnum device)
-{
-	AnimationBase* animation = nullptr;
-
-	LogDebug("OpenAnimationWithType: %s\r\n", path.c_str());
-	FILE* stream = nullptr;
-	if (0 != fopen_s(&stream, path.c_str(), "rb") ||
-		stream == nullptr)
-	{
-		LogError("OpenAnimationWithType: Failed to open animation! %s\r\n", path.c_str());
-	}
-	else
-	{
-		EChromaSDKDeviceTypeEnum targetDeviceType = GetDeviceType(device);
-		EChromaSDKDevice1DEnum targetDevice1D;
-		EChromaSDKDevice2DEnum targetDevice2D;
-		switch (targetDeviceType)
-		{
-		case EChromaSDKDeviceTypeEnum::DE_1D:
-			targetDevice1D = GetDevice1D(device);
-			break;
-		case EChromaSDKDeviceTypeEnum::DE_2D:
-			targetDevice2D = GetDevice2D(device);
-			break;
-		}
-		while (true)
-		{
-			animation = OpenAnimationStream(stream);
-			if (nullptr == animation)
-			{
-				break;
-			}
-			EChromaSDKDeviceTypeEnum deviceType = animation->GetDeviceType();
-			if (targetDeviceType != deviceType)
-			{
-				delete animation;
-				continue;
-			}
-			Animation1D* animation1D;
-			Animation2D* animation2D;
-			bool match = false;
-			switch (targetDeviceType)
-			{
-			case EChromaSDKDeviceTypeEnum::DE_1D:
-				animation1D = (Animation1D*)animation;
-				if (targetDevice1D == animation1D->GetDevice())
-				{
-					match = true;
-				}
-				break;
-			case EChromaSDKDeviceTypeEnum::DE_2D:
-				animation2D = (Animation2D*)animation;
-				if (targetDevice2D == animation2D->GetDevice())
-				{
-					match = true;
-				}
-				break;
-			}
-			if (!match)
-			{
-				delete animation;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		std::fclose(stream);
-		LogDebug("OpenAnimationWithType: Loaded %s\r\n", path.c_str());
 	}
 
 	return animation;

@@ -12,7 +12,6 @@ typedef bool(*PLUGIN_IS_DIALOG_OPEN)();
 typedef int(*PLUGIN_OPEN_EDITOR_DIALOG)(const char* path);
 typedef int(*PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY)(const char* path);
 typedef int(*PLUGIN_OPEN_ANIMATION)(const char* path);
-typedef int(*PLUGIN_OPEN_ANIMATION_WITH_TYPE)(const char* path, int device);
 typedef int(*PLUGIN_CLOSE_ANIMATION)(int animationId);
 typedef int(*PLUGIN_PLAY_ANIMATION)(int animationId);
 typedef void(*PLUGIN_PLAY_ANIMATION_NAME)(const char* path, bool loop);
@@ -39,7 +38,6 @@ PLUGIN_IS_DIALOG_OPEN _gMethodIsDialogOpen = nullptr;
 PLUGIN_OPEN_EDITOR_DIALOG _gMethodOpenDialog = nullptr;
 PLUGIN_OPEN_EDITOR_DIALOG_AND_PLAY _gMethodOpenDialogAndPlay = nullptr;
 PLUGIN_OPEN_ANIMATION _gMethodOpenAnimation = nullptr;
-PLUGIN_OPEN_ANIMATION_WITH_TYPE _gMethodOpenAnimationWithType = nullptr;
 PLUGIN_CLOSE_ANIMATION _gMethodCloseAnimation = nullptr;
 PLUGIN_PLAY_ANIMATION _gMethodPlayAnimation = nullptr;
 PLUGIN_PLAY_ANIMATION_NAME _gMethodPlayAnimationName = nullptr;
@@ -104,13 +102,6 @@ int Init()
 	if (_gMethodOpenAnimation == nullptr)
 	{
 		fprintf(stderr, "Failed to find method PluginOpenAnimation!\r\n");
-		return -1;
-	}
-
-	_gMethodOpenAnimationWithType = (PLUGIN_OPEN_ANIMATION_WITH_TYPE)GetProcAddress(library, "PluginOpenAnimationWithType");
-	if (_gMethodOpenAnimationWithType == nullptr)
-	{
-		fprintf(stderr, "Failed to find method PluginOpenAnimationWithType!\r\n");
 		return -1;
 	}
 
@@ -347,28 +338,30 @@ void DebugUnitTests()
 	}
 	else
 	{
+		fprintf(stdout, "Play blank animation\r\n");
 		const char* fileBlank = "Blank_Keyboard.chroma";
 		_gMethodPlayAnimationName(fileBlank, false);
 		Sleep(500);
+
+		fprintf(stdout, "Play composite animation\r\n");
 		const char* fileAnimation = "Composite.chroma";
 		_gMethodPlayAnimationName(fileAnimation, false);
-		Sleep(3000);
-		_gMethodPlayAnimationName(fileAnimation, false);
-		Sleep(3000);
+		Sleep(500);
+
+		fprintf(stdout, "Play composite animation\r\n");
 		_gMethodPlayAnimationName(fileAnimation, false);
 		Sleep(500);
-		int animationId =_gMethodOpenAnimationWithType(fileAnimation, (int)EChromaSDKDeviceEnum::EDIT_Keyboard);
-		if (animationId >= 0)
-		{
-			_gMethodPlayAnimation(animationId);
-		}
-		Sleep(3000);
-		if (animationId >= 0)
-		{
-			_gMethodStopAnimation(animationId);
-		}
+
+		fprintf(stdout, "Stop composite animation\r\n");
+		_gMethodStopAnimationName(fileAnimation);
+		Sleep(500);
+
+		fprintf(stdout, "Close composite animation\r\n");
+		_gMethodCloseAnimationName(fileAnimation);
 		Sleep(3000);
 
+		fprintf(stdout, "Other tests\r\n");
+		fileAnimation = "Random_Keyboard.chroma";
 		int frameCount = _gMethodGetFrameCountName(fileAnimation);
 		for (int index = 0; index < frameCount; ++index)
 		{
