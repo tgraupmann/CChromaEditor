@@ -1047,7 +1047,7 @@ void CMainViewDlg::OnSliderBrushIntensity(UINT nPos)
 	green = (int)(green * _mBrushIntensitity);
 	blue = (int)(blue * _mBrushIntensitity);
 
-	color = (red & 0xFF) | ((green << 8) & 0xFF00) | ((blue << 16) && 0xFF0000);
+	color = (red & 0xFF) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
 
 	GetColorButtons()[0]->SetColor(color, color);
 	GetColorButtons()[0]->Invalidate();
@@ -1075,8 +1075,7 @@ COLORREF CMainViewDlg::GetColor()
 	green = (int)(green * _mBrushIntensitity);
 	blue = (int)(blue * _mBrushIntensitity);
 
-	color = (red & 0xFF) | ((green << 8) & 0xFF00) | ((blue << 16) && 0xFF0000);
-
+	color = (red & 0xFF) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
 	return color;
 }
 
@@ -1162,6 +1161,7 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 				{
 					COLORREF color = dlg.GetColor();
 					SetColor(color);
+					color = GetColor();
 					GetColorButtons()[0]->SetColor(color, color);
 					GetColorButtons()[0]->Invalidate();
 				}
@@ -1172,6 +1172,7 @@ void CMainViewDlg::OnBnClickedButtonColor(UINT nID)
 				CColorButton* button = buttons[index];
 				COLORREF color = button->GetBackgroundColor();
 				SetColor(color);
+				color = GetColor();
 				GetColorButtons()[0]->SetColor(color, color);
 				GetColorButtons()[0]->Invalidate();
 			}
