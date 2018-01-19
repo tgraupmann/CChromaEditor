@@ -348,6 +348,10 @@ void DebugUnitTests()
 		_gMethodPlayAnimationName(fileAnimation, false);
 		Sleep(100);
 
+		fprintf(stdout, "Close composite animation\r\n");
+		_gMethodCloseAnimationName(fileAnimation);
+		Sleep(1000);
+
 		fprintf(stdout, "Play composite animation\r\n");
 		_gMethodPlayAnimationName(fileAnimation, false);
 		Sleep(100);

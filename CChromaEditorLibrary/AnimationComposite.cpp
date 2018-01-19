@@ -14,12 +14,30 @@ namespace ChromaSDK
 	}
 	AnimationComposite::~AnimationComposite()
 	{
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationChromaLink));
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationHeadset));
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeyboard));
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeypad));
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMouse));
-		PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMousepad));
+		if (_mAnimationChromaLink != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationChromaLink));
+		}
+		if (_mAnimationHeadset != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationHeadset));
+		}
+		if (_mAnimationKeyboard != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeyboard));
+		}
+		if (_mAnimationKeypad != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeypad));
+		}
+		if (_mAnimationMouse != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMouse));
+		}
+		if (_mAnimationMousepad != nullptr)
+		{
+			PluginCloseAnimation(PluginGetAnimationIdFromInstance(_mAnimationMousepad));
+		}
 	}
 	Animation1D* AnimationComposite::GetChromaLink()
 	{
@@ -176,27 +194,27 @@ namespace ChromaSDK
 	{
 		if (_mAnimationChromaLink != nullptr)
 		{
-			_mAnimationChromaLink->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationChromaLink), loop);
 		}
 		if (_mAnimationHeadset != nullptr)
 		{
-			_mAnimationHeadset->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationHeadset), loop);
 		}
 		if (_mAnimationKeyboard != nullptr)
 		{
-			_mAnimationKeyboard->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationKeyboard), loop);
 		}
 		if (_mAnimationKeypad != nullptr)
 		{
-			_mAnimationKeypad->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationKeypad), loop);
 		}
 		if (_mAnimationMouse != nullptr)
 		{
-			_mAnimationMouse->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationMouse), loop);
 		}
 		if (_mAnimationMousepad != nullptr)
 		{
-			_mAnimationMousepad->Play(loop);
+			PluginPlayAnimationLoop(PluginGetAnimationIdFromInstance(_mAnimationMousepad), loop);
 		}
 	}
 
@@ -294,27 +312,27 @@ namespace ChromaSDK
 	{
 		if (_mAnimationChromaLink != nullptr)
 		{
-			_mAnimationChromaLink->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationChromaLink));
 		}
 		if (_mAnimationHeadset != nullptr)
 		{
-			_mAnimationHeadset->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationHeadset));
 		}
 		if (_mAnimationKeyboard != nullptr)
 		{
-			_mAnimationKeyboard->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeyboard));
 		}
 		if (_mAnimationKeypad != nullptr)
 		{
-			_mAnimationKeypad->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationKeypad));
 		}
 		if (_mAnimationMouse != nullptr)
 		{
-			_mAnimationMouse->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationMouse));
 		}
 		if (_mAnimationMousepad != nullptr)
 		{
-			_mAnimationMousepad->Stop();
+			PluginStopAnimation(PluginGetAnimationIdFromInstance(_mAnimationMousepad));
 		}
 	}
 

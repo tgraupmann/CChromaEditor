@@ -535,6 +535,25 @@ extern "C"
 					return -1;
 				}
 				animation->Stop();
+				Animation1D* animation1D;
+				Animation2D* animation2D;
+				switch (animation->GetDeviceType())
+				{
+				case EChromaSDKDeviceTypeEnum::DE_1D:
+					animation1D = (Animation1D*)animation;
+					if (_gPlayMap1D[animation1D->GetDevice()] == animationId)
+					{
+						_gPlayMap1D[animation1D->GetDevice()] = -1;
+					}
+					break;
+				case EChromaSDKDeviceTypeEnum::DE_2D:
+					animation2D = (Animation2D*)animation;
+					if (_gPlayMap2D[animation2D->GetDevice()] == animationId)
+					{
+						_gPlayMap2D[animation2D->GetDevice()] = -1;
+					}
+					break;
+				}
 				return animationId;
 			}
 		}
