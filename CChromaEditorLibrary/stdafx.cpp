@@ -1449,7 +1449,7 @@ extern "C"
 	{
 		if (animation == nullptr)
 		{
-			fprintf(stderr, "PluginGetAnimationIdFromInstance: Invalid animation!\r\n");
+			LogError("PluginGetAnimationIdFromInstance: Invalid animation!\r\n");
 			return -1;
 		}
 		for (int index = 0; index < _gAnimations.size(); ++index)
