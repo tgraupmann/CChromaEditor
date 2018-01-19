@@ -347,7 +347,12 @@ void DebugUnitTests()
 	}
 	else
 	{
+		const char* fileBlank = "Blank_Keyboard.chroma";
+		_gMethodPlayAnimationName(fileBlank, false);
+		Sleep(500);
 		const char* fileAnimation = "Composite.chroma";
+		_gMethodPlayAnimationName(fileAnimation, false);
+		Sleep(3000);
 		int animationId =_gMethodOpenAnimationWithType(fileAnimation, (int)EChromaSDKDeviceEnum::EDIT_Keyboard);
 		if (animationId >= 0)
 		{

@@ -1379,6 +1379,15 @@ extern "C"
 
 	EXPORT_API void PluginPlayAnimationLoop(int animationId, bool loop)
 	{
+		// Chroma thread plays animations
+		SetupChromaThread();
+
+		if (!PluginIsInitialized())
+		{
+			LogError("PluginPlayAnimationLoop: Plugin is not initialized!\r\n");
+			return;
+		}
+
 		if (_gAnimations.find(animationId) != _gAnimations.end())
 		{
 			AnimationBase* animation = _gAnimations[animationId];
