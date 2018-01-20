@@ -1027,6 +1027,11 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
+void CMainViewDlg::OnOK()
+{
+	// stop enter from closing the dialog
+}
+
 void CMainViewDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	OnSliderBrushIntensity();

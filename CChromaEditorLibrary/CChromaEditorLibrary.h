@@ -96,6 +96,8 @@ public:
 	afx_msg void OnBnClickedButtonEnable();
 	afx_msg void OnSelChangeListTypes();
 	
+	virtual void OnOK();
+
 	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
 	void OnSliderBrushIntensity();
