@@ -132,6 +132,20 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 
 void CMainViewDlg::LoadFile()
 {
+	_mEditChromaLink.CloseAnimation();
+	_mEditHeadset.CloseAnimation();
+	_mEditKeyboard.CloseAnimation();
+	_mEditKeypad.CloseAnimation();
+	_mEditMouse.CloseAnimation();
+	_mEditMousepad.CloseAnimation();
+
+	_mEditChromaLink.SetAnimation(nullptr);
+	_mEditHeadset.SetAnimation(nullptr);
+	_mEditKeyboard.SetAnimation(nullptr);
+	_mEditKeypad.SetAnimation(nullptr);
+	_mEditMouse.SetAnimation(nullptr);
+	_mEditMousepad.SetAnimation(nullptr);
+
 	AnimationBase* selectedAnimation = nullptr;
 	AnimationBase* animation = nullptr;
 	int animationId;
@@ -2096,14 +2110,33 @@ void CMainViewDlg::OnBnClickedButtonSetDuration()
 
 void CMainViewDlg::OnBnClickedMenuNew()
 {
-	// stop animation
-	OnBnClickedButtonStop();
+	int index = GetControlListTypes()->GetCurSel();
 
-	OnBnClickedButtonReset();
+	_mPath = "";
+	LoadFile();
+
+	// Create the grid buttons
+	RecreateGrid();
+
+	// Display enums
+	RefreshDevice();
+
+	// Display grid
+	RefreshGrid();
+
+	// DIsplay frames
+	RefreshFrames();
+
+	GetControlListTypes()->SetCurSel(index);
+
+	//show changes
+	OnBnClickedButtonPreview();
 }
 
 void CMainViewDlg::OnBnClickedMenuOpen()
 {
+	int index = GetControlListTypes()->GetCurSel();
+
 	// stop animation
 	OnBnClickedButtonStop();
 
@@ -2140,6 +2173,9 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 		}
 		LoadFile();
 
+		GetControlListTypes()->SetCurSel(index);
+		OnSelChangeListTypes();
+
 		// Create the grid buttons
 		RecreateGrid();
 
@@ -2148,6 +2184,11 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 
 		// Display grid
 		RefreshGrid();
+
+		//show changes
+		OnBnClickedButtonPreview();
+
+		GetControlListTypes()->SetCurSel(index);
 	}
 	fileName.ReleaseBuffer();
 }
