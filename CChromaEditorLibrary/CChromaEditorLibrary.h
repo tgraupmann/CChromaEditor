@@ -98,7 +98,7 @@ public:
 	
 	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
-	void OnSliderBrushIntensity(UINT nPos);
+	void OnSliderBrushIntensity();
 
 	void OnBnClickedButtonColor(UINT nID);
 

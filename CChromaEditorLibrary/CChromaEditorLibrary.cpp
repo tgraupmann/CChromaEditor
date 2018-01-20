@@ -1029,26 +1029,12 @@ END_MESSAGE_MAP()
 
 void CMainViewDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	CSliderCtrl *ACSliderCtrl = (CSliderCtrl *)pScrollBar;
-	int nID = ACSliderCtrl->GetDlgCtrlID();
-	int newPos = ((CSliderCtrl *)pScrollBar)->GetPos();
-
-	switch (nID)
-	{
-	case IDC_SLIDER_BRUSH:
-		// Check what happened  
-		switch (nSBCode)
-		{
-		case TB_THUMBTRACK:
-			OnSliderBrushIntensity(nPos);
-			break;
-		}
-		break;
-	}
+	OnSliderBrushIntensity();
 }
 
-void CMainViewDlg::OnSliderBrushIntensity(UINT nPos)
+void CMainViewDlg::OnSliderBrushIntensity()
 {
+	UINT nPos = GetBrushSlider()->GetPos();
 	_mBrushIntensitity = nPos / 100.0f;
 
 	// temp copy
