@@ -196,17 +196,17 @@ int Init()
 		return -1;
 	}
 
-	_gMethodGetFrameCountName = (PLUGIN_GET_FRAME_COUNT_NAME)GetProcAddress(library, "PluginSetKeyColorName");
+	_gMethodGetFrameCountName = (PLUGIN_GET_FRAME_COUNT_NAME)GetProcAddress(library, "PluginGetFrameCountName");
 	if (_gMethodGetFrameCountName == nullptr)
 	{
-		fprintf(stderr, "Failed to find method PluginSetKeyColorName!\r\n");
+		fprintf(stderr, "Failed to find method PluginGetFrameCountName!\r\n");
 		return -1;
 	}
 
-	_gMethodSetKeyColorName = (PLUGIN_SET_KEY_COLOR_NAME)GetProcAddress(library, "PluginCopyKeyColor");
+	_gMethodSetKeyColorName = (PLUGIN_SET_KEY_COLOR_NAME)GetProcAddress(library, "PluginSetKeyColorName");
 	if (_gMethodSetKeyColorName == nullptr)
 	{
-		fprintf(stderr, "Failed to find method PluginCopyKeyColor!\r\n");
+		fprintf(stderr, "Failed to find method PluginSetKeyColorName!\r\n");
 		return -1;
 	}
 
