@@ -917,6 +917,31 @@ void CMainViewDlg::OnSelChangeListTypes()
 	OnBnClickedButtonPreview();
 }
 
+void CMainViewDlg::OnTextChangeFrameIndex()
+{
+	//update frames label
+	char bufferFrameInfo[48] = { 0 };
+	int currentFrame = GetCurrentFrame();
+	int frameCount = GetFrameCount();
+
+	CString strIndex;
+	GetControlFrameIndex()->GetWindowText(strIndex);
+	int index;
+	int result = swscanf_s(strIndex, _T("%d"), &index);
+	if (result == 1 &&
+		index > 0 &&
+		index <= frameCount &&
+		index != (currentFrame+1))
+	{
+		SetCurrentFrame(index-1);
+		RefreshGrid();
+		RefreshFrames();
+
+		//show changes
+		OnBnClickedButtonPreview();
+	}
+}
+
 BOOL CMainViewDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// check focus first
@@ -1008,6 +1033,8 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_UNLOAD, &CMainViewDlg::OnBnClickedButtonUnload)
 	ON_BN_CLICKED(IDC_BUTTON_SET_KEY, &CMainViewDlg::OnBnClickedButtonSetKey)
 	ON_BN_CLICKED(IDC_BUTTON_SET_LED, &CMainViewDlg::OnBnClickedButtonSetLed)
+	ON_BN_CLICKED(IDC_BUTTON_FIRST, &CMainViewDlg::OnBnClickedButtonFirst)
+	ON_BN_CLICKED(IDC_BUTTON_LAST, &CMainViewDlg::OnBnClickedButtonLast)
 	ON_BN_CLICKED(IDC_BUTTON_PREVIOUS, &CMainViewDlg::OnBnClickedButtonPrevious)
 	ON_BN_CLICKED(IDC_BUTTON_NEXT, &CMainViewDlg::OnBnClickedButtonNext)
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CMainViewDlg::OnBnClickedButtonAdd)
@@ -1025,6 +1052,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_IMPORT_IMAGE, &CMainViewDlg::OnBnClickedMenuImportImage)
 	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
 	ON_WM_HSCROLL()
+	ON_EN_CHANGE(IDC_EDIT_FRAME_INDEX, &CMainViewDlg::OnTextChangeFrameIndex)
 END_MESSAGE_MAP()
 
 void CMainViewDlg::OnOK()
@@ -1911,6 +1939,29 @@ void CMainViewDlg::OnBnClickedButtonSetLed()
 	OnBnClickedButtonPreview();
 }
 
+void CMainViewDlg::OnBnClickedButtonFirst()
+{
+	SetCurrentFrame(0);
+	RefreshGrid();
+	RefreshFrames();
+
+	//show changes
+	OnBnClickedButtonPreview();
+}
+
+void CMainViewDlg::OnBnClickedButtonLast()
+{
+	int frameCount = GetFrameCount();
+	if (frameCount > 0)
+	{
+		SetCurrentFrame(frameCount - 1);
+		RefreshGrid();
+		RefreshFrames();
+
+		//show changes
+		OnBnClickedButtonPreview();
+	}
+}
 
 void CMainViewDlg::OnBnClickedButtonPrevious()
 {

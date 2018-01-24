@@ -81,6 +81,8 @@ public:
 	afx_msg void OnBnClickedButtonUnload();
 	afx_msg void OnBnClickedButtonSetKey();
 	afx_msg void OnBnClickedButtonSetLed();
+	afx_msg void OnBnClickedButtonFirst();
+	afx_msg void OnBnClickedButtonLast();
 	afx_msg void OnBnClickedButtonPrevious();
 	afx_msg void OnBnClickedButtonNext();
 	afx_msg void OnBnClickedButtonAdd();
@@ -95,6 +97,7 @@ public:
 	afx_msg void OnBnClickedButtonLoop();
 	afx_msg void OnBnClickedButtonEnable();
 	afx_msg void OnSelChangeListTypes();
+	afx_msg void OnTextChangeFrameIndex();
 	
 	virtual void OnOK();
 
