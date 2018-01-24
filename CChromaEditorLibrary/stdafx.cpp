@@ -227,6 +227,103 @@ extern "C"
 		return PluginOpenEditorDialogAndPlay(path);
 	}
 
+	EXPORT_API const char* PluginGetAnimationName(int animationId)
+	{
+		if (animationId < 0)
+		{
+			return "";
+		}
+		AnimationBase* animation = GetAnimationInstance(animationId);
+		if (animation == nullptr)
+		{
+			return "";
+		}
+		return animation->GetName().c_str();
+	}
+
+	EXPORT_API void PluginStopAll()
+	{
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
+		PluginStopAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
+	}
+
+	EXPORT_API void PluginClearAnimationType(int deviceType, int device)
+	{
+		PluginStopAnimationType(deviceType, device);
+
+		FChromaSDKEffectResult result;
+		switch ((EChromaSDKDeviceTypeEnum)deviceType)
+		{
+		case EChromaSDKDeviceTypeEnum::DE_1D:
+			result = ChromaSDKPlugin::GetInstance()->CreateEffectNone1D((EChromaSDKDevice1DEnum)device);
+			if (result.Result == 0)
+			{
+				ChromaSDKPlugin::GetInstance()->SetEffect(result.EffectId);
+				ChromaSDKPlugin::GetInstance()->DeleteEffect(result.EffectId);
+			}
+			break;
+		case EChromaSDKDeviceTypeEnum::DE_2D:
+			result = ChromaSDKPlugin::GetInstance()->CreateEffectNone2D((EChromaSDKDevice2DEnum)device);
+			if (result.Result == 0)
+			{
+				ChromaSDKPlugin::GetInstance()->SetEffect(result.EffectId);
+				ChromaSDKPlugin::GetInstance()->DeleteEffect(result.EffectId);
+			}
+			break;
+		}
+	}
+
+	EXPORT_API void PluginClearAll()
+	{
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
+		PluginClearAnimationType((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
+	}
+
+	EXPORT_API int PluginGetAnimationCount()
+	{
+		return _gAnimationMapID.size();
+	}
+
+	EXPORT_API int PluginGetAnimationId(int index)
+	{
+		int i = 0;
+		for (std::map<string, int>::iterator it = _gAnimationMapID.begin(); it != _gAnimationMapID.end(); ++it)
+		{
+			if (index == i)
+			{
+				return (*it).second;
+			}
+			++i;
+		}
+		return -1;
+	}
+
+	EXPORT_API int PluginGetPlayingAnimationCount()
+	{
+		if (ChromaThread::Instance() == nullptr)
+		{
+			return 0;
+		}
+		return ChromaThread::Instance()->GetAnimationCount();
+	}
+
+	EXPORT_API int PluginGetPlayingAnimationId(int index)
+	{
+		if (ChromaThread::Instance() == nullptr)
+		{
+			return -1;
+		}
+		return ChromaThread::Instance()->GetAnimationId(index);
+	}
+
 	EXPORT_API int PluginOpenAnimation(const char* path)
 	{
 		try
