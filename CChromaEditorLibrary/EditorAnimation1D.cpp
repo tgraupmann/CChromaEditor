@@ -16,11 +16,19 @@ Animation1D* EditorAnimation1D::GetAnimation1D()
 
 EChromaSDKDevice1DEnum EditorAnimation1D::GetDevice()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return EChromaSDKDevice1DEnum::DE_ChromaLink;
+	}
 	return GetAnimation1D()->GetDevice();
 }
 
 bool EditorAnimation1D::SetDevice(EChromaSDKDevice1DEnum device)
 {
+	if (GetAnimation() == nullptr)
+	{
+		return false;
+	}
 	if (GetAnimation1D()->SetDevice(device))
 	{
 		Reset();

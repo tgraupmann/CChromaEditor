@@ -17,16 +17,28 @@ void EditorAnimationBase::SetAnimation(AnimationBase* animation)
 
 int EditorAnimationBase::GetCurrentFrame()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return 0;
+	}
 	return GetAnimation()->GetCurrentFrame();
 }
 
 void EditorAnimationBase::SetCurrentFrame(unsigned int index)
 {
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
 	GetAnimation()->SetCurrentFrame(index);
 }
 
 unsigned int EditorAnimationBase::GetFrameCount()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return 0;
+	}
 	return GetAnimation()->GetFrameCount();
 }
 
@@ -381,9 +393,9 @@ void EditorAnimationBase::Stop()
 
 void EditorAnimationBase::SaveStream(FILE* stream)
 {
-	AnimationBase* animation = GetAnimation();
-	if (animation != nullptr)
+	if (GetAnimation() == nullptr)
 	{
-		animation->SaveStream(stream);
+		return;
 	}
+	GetAnimation()->SaveStream(stream);
 }

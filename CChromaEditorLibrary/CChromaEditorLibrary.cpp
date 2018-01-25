@@ -681,16 +681,20 @@ void CMainViewDlg::RefreshGrid()
 
 void CMainViewDlg::RefreshFrames()
 {
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
 	//update frames label
 	char bufferFrameInfo[48] = { 0 };
 	int currentFrame = GetCurrentFrame();
 	int frameCount = GetFrameCount();
 
-	sprintf_s(bufferFrameInfo, "%d of %d", currentFrame + 1, frameCount);
-	GetControlFrames()->SetWindowText(CString(bufferFrameInfo));
-
 	sprintf_s(bufferFrameInfo, "%d", currentFrame + 1);
 	GetControlFrameIndex()->SetWindowText(CString(bufferFrameInfo));
+
+	sprintf_s(bufferFrameInfo, "%d of %d", currentFrame + 1, frameCount);
+	GetControlFrames()->SetWindowText(CString(bufferFrameInfo));
 
 	//update the frame duration
 	char bufferDuration[16] = { 0 };
