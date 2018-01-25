@@ -372,6 +372,11 @@ CSliderCtrl* CMainViewDlg::GetBrushSlider()
 	return (CSliderCtrl*)GetDlgItem(IDC_SLIDER_BRUSH);
 }
 
+CEdit* CMainViewDlg::GetControlEditBrush()
+{
+	return (CEdit*)GetDlgItem(IDC_EDIT_BRUSH);
+}
+
 CEdit* CMainViewDlg::GetControlEditDelete()
 {
 	return (CEdit*)GetDlgItem(IDC_EDIT_DELETE);
@@ -760,6 +765,7 @@ BOOL CMainViewDlg::OnInitDialog()
 {
 	_mBrushIntensitity = 1.0f;
 	GetBrushSlider()->SetPos(100);
+	GetControlEditBrush()->SetWindowText(_T("100"));
 
 	GetControlEditDelete()->SetWindowText(_T("2"));
 
@@ -1046,6 +1052,24 @@ BOOL CMainViewDlg::PreTranslateMessage(MSG* pMsg)
 					return true;
 				}
 				break;
+			case VK_OEM_4:
+				_mBrushIntensitity -= 0.2f;
+				if (_mBrushIntensitity < 0.0f)
+				{
+					_mBrushIntensitity = 0.0f;
+				}
+				GetBrushSlider()->SetPos(_mBrushIntensitity * 100);
+				OnSliderBrushIntensity();
+				break;
+			case VK_OEM_6:
+				_mBrushIntensitity += 0.2f;
+				if (_mBrushIntensitity > 100.0f)
+				{
+					_mBrushIntensitity = 100.0f;
+				}
+				GetBrushSlider()->SetPos(_mBrushIntensitity * 100);
+				OnSliderBrushIntensity();
+				break;
 			default:
 				fprintf(stdout, "Pressed: %d\r\n", (int)pMsg->wParam);
 				break;
@@ -1097,6 +1121,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
 	ON_WM_HSCROLL()
 	ON_EN_CHANGE(IDC_EDIT_FRAME_INDEX, &CMainViewDlg::OnTextChangeFrameIndex)
+	ON_EN_CHANGE(IDC_EDIT_BRUSH, &CMainViewDlg::OnTextChangeBrush)
 	ON_BN_CLICKED(IDC_BUTTON_NTH_DELETE, &CMainViewDlg::OnBnClickedButtonNthDelete)
 END_MESSAGE_MAP()
 
@@ -1113,6 +1138,9 @@ void CMainViewDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CMainViewDlg::OnSliderBrushIntensity()
 {
 	UINT nPos = GetBrushSlider()->GetPos();
+	char buffer[10] = { 0 };
+	sprintf_s(buffer, "%d", nPos);
+	GetControlEditBrush()->SetWindowText(CString(buffer));
 	_mBrushIntensitity = nPos / 100.0f;
 
 	// temp copy
@@ -1129,6 +1157,30 @@ void CMainViewDlg::OnSliderBrushIntensity()
 
 	GetColorButtons()[0]->SetColor(color, color);
 	GetColorButtons()[0]->Invalidate();
+}
+
+void CMainViewDlg::OnTextChangeBrush()
+{
+	CString strIntensity;
+	GetControlEditBrush()->GetWindowText(strIntensity);
+	int intensity;
+	int result = swscanf_s(strIntensity, _T("%d"), &intensity);
+	if (result == 1)
+	{
+		if (intensity < 0)
+		{
+			intensity = 0;
+		}
+		else if (intensity > 100)
+		{
+			intensity = 100;
+		}
+		if (GetBrushSlider()->GetPos() != intensity)
+		{
+			GetBrushSlider()->SetPos(intensity);
+			OnSliderBrushIntensity();
+		}
+	}
 }
 
 vector<CColorButton*>& CMainViewDlg::GetGridButtons()
