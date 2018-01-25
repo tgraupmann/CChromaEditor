@@ -372,6 +372,11 @@ CSliderCtrl* CMainViewDlg::GetBrushSlider()
 	return (CSliderCtrl*)GetDlgItem(IDC_SLIDER_BRUSH);
 }
 
+CEdit* CMainViewDlg::GetControlEditDelete()
+{
+	return (CEdit*)GetDlgItem(IDC_EDIT_DELETE);
+}
+
 void CMainViewDlg::UpdateOverrideTime(float time)
 {
 	char buffer[10] = { 0 };
@@ -756,6 +761,8 @@ BOOL CMainViewDlg::OnInitDialog()
 	_mBrushIntensitity = 1.0f;
 	GetBrushSlider()->SetPos(100);
 
+	GetControlEditDelete()->SetWindowText(_T("2"));
+
 	LoadFile();
 
 	// setup dialog
@@ -946,6 +953,39 @@ void CMainViewDlg::OnTextChangeFrameIndex()
 	}
 }
 
+void CMainViewDlg::OnBnClickedButtonNthDelete()
+{
+	OnBnClickedButtonStop();
+	OnBnClickedButtonUnload();
+	OnBnClickedButtonFirst();
+	
+	CString strNth;
+	GetControlEditDelete()->GetWindowText(strNth);
+
+	int nth;
+	int result = swscanf_s(strNth, _T("%d"), &nth);
+	if (result == 1 &&
+		nth > 1)
+	{
+		int index = 0;
+		int currentFrame;
+		do
+		{
+			currentFrame = GetCurrentFrame();
+			++index;
+			if (index == nth)
+			{
+				index = 0;
+				OnBnClickedButtonDelete();
+			}
+			else
+			{
+				OnBnClickedButtonNext();
+			}
+		} while ((currentFrame + 1) < GetFrameCount());
+	}
+}
+
 BOOL CMainViewDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// check focus first
@@ -1057,6 +1097,7 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
 	ON_WM_HSCROLL()
 	ON_EN_CHANGE(IDC_EDIT_FRAME_INDEX, &CMainViewDlg::OnTextChangeFrameIndex)
+	ON_BN_CLICKED(IDC_BUTTON_NTH_DELETE, &CMainViewDlg::OnBnClickedButtonNthDelete)
 END_MESSAGE_MAP()
 
 void CMainViewDlg::OnOK()
@@ -1226,6 +1267,8 @@ void CMainViewDlg::OnBnClickedMenuImportImage()
 	// stop animation
 	OnBnClickedButtonStop();
 
+	OnBnClickedButtonUnload();
+
 	GetEditor()->ImportTextureImage();
 	RefreshGrid();
 	RefreshFrames();
@@ -1240,6 +1283,8 @@ void CMainViewDlg::OnBnClickedMenuImportAnimation()
 {
 	// stop animation
 	OnBnClickedButtonStop();
+
+	OnBnClickedButtonUnload();
 
 	GetEditor()->ImportTextureAnimation();
 	RefreshGrid();

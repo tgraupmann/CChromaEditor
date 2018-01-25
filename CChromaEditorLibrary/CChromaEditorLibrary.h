@@ -98,6 +98,7 @@ public:
 	afx_msg void OnBnClickedButtonEnable();
 	afx_msg void OnSelChangeListTypes();
 	afx_msg void OnTextChangeFrameIndex();
+	afx_msg void OnBnClickedButtonNthDelete();
 	
 	virtual void OnOK();
 
@@ -159,6 +160,7 @@ private:
 	CEdit* GetControlDuration();
 	CButton* GetControlUseKeyboardCustomKeys();
 	CSliderCtrl* GetBrushSlider();
+	CEdit* GetControlEditDelete();
 
 	void UpdateOverrideTime(float time);
 	float GetOverrideTime();
