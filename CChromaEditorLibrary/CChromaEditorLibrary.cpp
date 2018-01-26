@@ -2329,6 +2329,7 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 	{
 		CloseOpenAnimation();
 		POSITION pos(dlgFile.GetStartPosition());
+		int openFiles = 0;
 		while (pos)
 		{
 			CString filename = dlgFile.GetNextPathName(pos);
@@ -2340,6 +2341,12 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 				_mPath += ".chroma";
 			}
 			LoadFile();
+			++openFiles;
+		}
+
+		if (openFiles > 1)
+		{
+			OnBnClickedMenuSaveAs();
 		}
 
 		GetControlListTypes()->SetCurSel(index);
