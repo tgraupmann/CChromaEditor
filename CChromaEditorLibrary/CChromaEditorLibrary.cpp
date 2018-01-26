@@ -131,7 +131,7 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 	}
 }
 
-void CMainViewDlg::LoadFile()
+void CMainViewDlg::CloseOpenAnimation()
 {
 	_mEditChromaLink.CloseAnimation();
 	_mEditHeadset.CloseAnimation();
@@ -146,7 +146,10 @@ void CMainViewDlg::LoadFile()
 	_mEditKeypad.SetAnimation(nullptr);
 	_mEditMouse.SetAnimation(nullptr);
 	_mEditMousepad.SetAnimation(nullptr);
+}
 
+void CMainViewDlg::LoadFile()
+{
 	AnimationBase* selectedAnimation = nullptr;
 	AnimationBase* animation = nullptr;
 	int animationId;
@@ -193,13 +196,6 @@ void CMainViewDlg::LoadFile()
 		}
 		else
 		{
-			_mEditChromaLink.SetAnimation(nullptr);
-			_mEditHeadset.SetAnimation(nullptr);
-			_mEditKeyboard.SetAnimation(nullptr);
-			_mEditKeypad.SetAnimation(nullptr);
-			_mEditMouse.SetAnimation(nullptr);
-			_mEditMousepad.SetAnimation(nullptr);
-
 			do
 			{
 				animation = ChromaSDKPlugin::GetInstance()->OpenAnimationStream(stream);
@@ -770,6 +766,7 @@ BOOL CMainViewDlg::OnInitDialog()
 
 	GetControlEditDelete()->SetWindowText(_T("2"));
 
+	CloseOpenAnimation();
 	LoadFile();
 
 	// setup dialog
@@ -2278,6 +2275,7 @@ void CMainViewDlg::OnBnClickedMenuNew()
 	int index = GetControlListTypes()->GetCurSel();
 
 	_mPath = "";
+	CloseOpenAnimation();
 	LoadFile();
 
 	// Create the grid buttons
@@ -2319,24 +2317,30 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 	const int MAX_CFileDialog_FILE_COUNT = 99;
 	const int FILE_LIST_BUFFER_SIZE = ((MAX_CFileDialog_FILE_COUNT * (MAX_PATH + 1)) + 1);
 
-	CString fileName;
-	wchar_t* p = fileName.GetBuffer(FILE_LIST_BUFFER_SIZE);
-	CFileDialog dlgFile(TRUE);
+	CString initialPath;
+	wchar_t* p = initialPath.GetBuffer(FILE_LIST_BUFFER_SIZE);
+	CFileDialog dlgFile(TRUE, _T("chroma"), NULL, OFN_ALLOWMULTISELECT, _T("Chroma Animations (*.chroma)|*.chroma*||"));
 	OPENFILENAME& ofn = dlgFile.GetOFN();
-	ofn.lpstrFilter = _TEXT("Animation\0*.chroma\0");
 	ofn.lpstrInitialDir = szDir;
 	ofn.lpstrFile = p;
 	ofn.nMaxFile = FILE_LIST_BUFFER_SIZE;
 
 	if (dlgFile.DoModal() == IDOK)
 	{
-		_mPath = string(CT2CA(fileName));
-		if (_mPath.size() <= 2 ||
-			_mPath.substr(_mPath.find_last_of(".") + 1) != "chroma")
+		CloseOpenAnimation();
+		POSITION pos(dlgFile.GetStartPosition());
+		while (pos)
 		{
-			_mPath += ".chroma";
+			CString filename = dlgFile.GetNextPathName(pos);
+
+			_mPath = string(CT2CA(filename));
+			if (_mPath.size() <= 2 ||
+				_mPath.substr(_mPath.find_last_of(".") + 1) != "chroma")
+			{
+				_mPath += ".chroma";
+			}
+			LoadFile();
 		}
-		LoadFile();
 
 		GetControlListTypes()->SetCurSel(index);
 		OnSelChangeListTypes();
@@ -2355,7 +2359,7 @@ void CMainViewDlg::OnBnClickedMenuOpen()
 
 		GetControlListTypes()->SetCurSel(index);
 	}
-	fileName.ReleaseBuffer();
+	initialPath.ReleaseBuffer();
 }
 
 void CMainViewDlg::OnBnClickedMenuSave()

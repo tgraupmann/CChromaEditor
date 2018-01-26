@@ -46,6 +46,7 @@ public:
 
 	void OpenOrCreateAnimation(const std::string& path);
 	void PlayAnimationOnOpen();
+	void CloseOpenAnimation();
 	void LoadFile();
 	void SaveFile();
 
