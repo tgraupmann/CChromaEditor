@@ -65,8 +65,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedMenuImportImage();
-	afx_msg void OnBnClickedMenuImportAnimation();
 	afx_msg void OnBnClickedButtonImportOverrideTime();
 	afx_msg void OnBnClickedCheckUseKeyboardKeyType();
 	afx_msg void OnBnClickedButtonClear();
@@ -89,19 +87,24 @@ public:
 	afx_msg void OnBnClickedButtonDelete();
 	afx_msg void OnBnClickedButtonReset();
 	afx_msg void OnBnClickedButtonSetDuration();
-	afx_msg void OnBnClickedMenuNew();
-	afx_msg void OnBnClickedMenuOpen();
-	afx_msg void OnBnClickedMenuSave();
-	afx_msg void OnBnClickedMenuSaveAs();
-	afx_msg void OnBnClickedMenuExit();
 	afx_msg void OnBnClickedButtonLoop();
 	afx_msg void OnBnClickedButtonEnable();
 	afx_msg void OnSelChangeListTypes();
 	afx_msg void OnTextChangeFrameIndex();
 	afx_msg void OnTextChangeBrush();
 	afx_msg void OnBnClickedButtonNthDelete();
+	afx_msg void OnBnClickedMenuNew();
+	afx_msg void OnBnClickedMenuOpen();
+	afx_msg void OnBnClickedMenuSave();
+	afx_msg void OnBnClickedMenuSaveAs();
+	afx_msg void OnBnClickedMenuExit();
+	afx_msg void OnBnClickedMenuImportAnimation();
+	afx_msg void OnBnClickedMenuImportImage();
 	
 	virtual void OnOK();
+
+	// Update preview when animation is playing
+	virtual void OnTimer(UINT_PTR TimerVal);
 
 	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
@@ -202,4 +205,6 @@ private:
 	bool _mControlModifier;
 
 	float _mBrushIntensitity;
+
+	UINT _mTimer;
 };

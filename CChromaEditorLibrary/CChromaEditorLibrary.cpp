@@ -11,9 +11,10 @@
 
 #define TEMP_FILE "temp.chroma"
 #define ANIMATION_VERSION 1
-#define ID_DYNAMIC_BUTTON_MIN 2000
-#define ID_DYNAMIC_COLOR_MIN 2200
-#define ID_DYNAMIC_BUTTON_MAX 2256
+#define ID_DYNAMIC_BUTTON_MIN	2000
+#define ID_DYNAMIC_COLOR_MIN	2200
+#define ID_DYNAMIC_BUTTON_MAX	2256
+#define	IDT_TIMER_0				2257
 
 #define DEFAULT_OVERRIDE_TIME 0.1f
 #define DEFAULT_DURATION 1.0f
@@ -859,6 +860,8 @@ BOOL CMainViewDlg::OnInitDialog()
 	int index = (int)_mDevice;
 	GetControlListTypes()->SetCurSel(index);
 
+	_mTimer = SetTimer(IDT_TIMER_0, 100, NULL);
+
 	return TRUE;
 }
 
@@ -1112,6 +1115,10 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SET_DURATION, &CMainViewDlg::OnBnClickedButtonSetDuration)
 	ON_LBN_SELCHANGE(IDC_LIST_TYPES, &CMainViewDlg::OnSelChangeListTypes)
 	ON_BN_CLICKED(IDC_BUTTON_ENABLE, &CMainViewDlg::OnBnClickedButtonEnable)
+	ON_WM_HSCROLL()
+	ON_EN_CHANGE(IDC_EDIT_FRAME_INDEX, &CMainViewDlg::OnTextChangeFrameIndex)
+	ON_EN_CHANGE(IDC_EDIT_BRUSH, &CMainViewDlg::OnTextChangeBrush)
+	ON_BN_CLICKED(IDC_BUTTON_NTH_DELETE, &CMainViewDlg::OnBnClickedButtonNthDelete)
 	ON_BN_CLICKED(ID_MENU_NEW, &CMainViewDlg::OnBnClickedMenuNew)
 	ON_BN_CLICKED(ID_MENU_OPEN, &CMainViewDlg::OnBnClickedMenuOpen)
 	ON_BN_CLICKED(ID_MENU_SAVE, &CMainViewDlg::OnBnClickedMenuSave)
@@ -1119,15 +1126,28 @@ BEGIN_MESSAGE_MAP(CMainViewDlg, CDialogEx)
 	ON_BN_CLICKED(ID_MENU_EXIT, &CMainViewDlg::OnBnClickedMenuExit)
 	ON_BN_CLICKED(ID_MENU_IMPORT_IMAGE, &CMainViewDlg::OnBnClickedMenuImportImage)
 	ON_BN_CLICKED(ID_MENU_IMPORT_ANIMATION, &CMainViewDlg::OnBnClickedMenuImportAnimation)
-	ON_WM_HSCROLL()
-	ON_EN_CHANGE(IDC_EDIT_FRAME_INDEX, &CMainViewDlg::OnTextChangeFrameIndex)
-	ON_EN_CHANGE(IDC_EDIT_BRUSH, &CMainViewDlg::OnTextChangeBrush)
-	ON_BN_CLICKED(IDC_BUTTON_NTH_DELETE, &CMainViewDlg::OnBnClickedButtonNthDelete)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 void CMainViewDlg::OnOK()
 {
 	// stop enter from closing the dialog
+}
+
+void CMainViewDlg::OnTimer(UINT_PTR TimerVal)
+{
+	if (GetAnimation() == nullptr)
+	{
+		return;
+	}
+	if (GetAnimation()->IsPlaying())
+	{
+		// Display grid
+		RefreshGrid();
+
+		// DIsplay frames
+		RefreshFrames();
+	}
 }
 
 void CMainViewDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
@@ -2197,6 +2217,8 @@ void CMainViewDlg::OnBnClickedButtonReset()
 {
 	// stop animation
 	OnBnClickedButtonStop();
+
+	OnBnClickedButtonUnload();
 
 	AnimationBase* animation = GetAnimation();
 	if (animation != nullptr)
