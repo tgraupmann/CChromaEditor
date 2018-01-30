@@ -39,6 +39,7 @@ namespace ChromaSDK
 		EDIT_Keypad = 3,
 		EDIT_Mouse = 4,
 		EDIT_Mousepad = 5,
+		EDIT_Composite = 6,
 	};
 
 	enum EChromaSDKDevice1DEnum

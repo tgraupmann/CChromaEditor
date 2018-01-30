@@ -30,6 +30,11 @@ void Animation2D::Reset()
 	_mUseKeyboardCustomKeyType = false;
 }
 
+EChromaSDKDeviceEnum Animation2D::GetDeviceEnum()
+{
+	return ChromaSDKPlugin::GetInstance()->GetDeviceEnum2D(_mDevice);
+}
+
 EChromaSDKDeviceTypeEnum Animation2D::GetDeviceType()
 {
 	return EChromaSDKDeviceTypeEnum::DE_2D;

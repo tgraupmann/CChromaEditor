@@ -35,6 +35,7 @@ namespace ChromaSDK
 		void Stop();
 		void Update(float deltaTime);
 		int Save(const char* path);
+		virtual EChromaSDKDeviceEnum GetDeviceEnum();
 		// ???
 		virtual EChromaSDKDeviceTypeEnum GetDeviceType();
 		virtual int GetDeviceId();

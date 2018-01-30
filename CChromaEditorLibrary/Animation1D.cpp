@@ -29,6 +29,11 @@ void Animation1D::Reset()
 	_mLoop = false;
 }
 
+EChromaSDKDeviceEnum Animation1D::GetDeviceEnum()
+{
+	return ChromaSDKPlugin::GetInstance()->GetDeviceEnum1D(_mDevice);
+}
+
 EChromaSDKDeviceTypeEnum Animation1D::GetDeviceType()
 {
 	return EChromaSDKDeviceTypeEnum::DE_1D;

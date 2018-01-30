@@ -1471,6 +1471,19 @@ EChromaSDKDeviceEnum ChromaSDKPlugin::GetDeviceEnum2D(EChromaSDKDevice2DEnum dev
 	}
 }
 
+EChromaSDKDeviceEnum ChromaSDKPlugin::GetDeviceEnum(int deviceType, int device)
+{
+	switch ((EChromaSDKDeviceTypeEnum)deviceType)
+	{
+		case EChromaSDKDeviceTypeEnum::DE_1D:
+			return GetDeviceEnum1D((EChromaSDKDevice1DEnum)device);
+		case EChromaSDKDeviceTypeEnum::DE_2D:
+			return GetDeviceEnum2D((EChromaSDKDevice2DEnum)device);
+		default:
+			return EChromaSDKDeviceEnum::EDIT_Composite;
+	}
+}
+
 EChromaSDKDeviceTypeEnum ChromaSDKPlugin::GetDeviceType(EChromaSDKDeviceEnum device)
 {
 	switch (device)

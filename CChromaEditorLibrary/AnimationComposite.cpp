@@ -405,11 +405,15 @@ namespace ChromaSDK
 		}
 		return -1;
 	}
-	//???
+	EChromaSDKDeviceEnum AnimationComposite::GetDeviceEnum()
+	{
+		return EChromaSDKDeviceEnum::EDIT_Composite;
+	}
 	EChromaSDKDeviceTypeEnum AnimationComposite::GetDeviceType()
 	{
 		return EChromaSDKDeviceTypeEnum::DE_Composite;
 	}
+	//???
 	int AnimationComposite::GetDeviceId()
 	{
 		return -1;

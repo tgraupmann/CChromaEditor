@@ -58,6 +58,7 @@ namespace ChromaSDK
 
 		EChromaSDKDeviceEnum GetDeviceEnum1D(EChromaSDKDevice1DEnum device1D);
 		EChromaSDKDeviceEnum GetDeviceEnum2D(EChromaSDKDevice2DEnum device2D);
+		EChromaSDKDeviceEnum GetDeviceEnum(int deviceType, int device);
 		EChromaSDKDeviceTypeEnum GetDeviceType(EChromaSDKDeviceEnum device);
 		EChromaSDKDevice1DEnum GetDevice1D(EChromaSDKDeviceEnum device);
 		EChromaSDKDevice2DEnum GetDevice2D(EChromaSDKDeviceEnum device);

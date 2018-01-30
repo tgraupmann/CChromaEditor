@@ -68,8 +68,7 @@ string _gPath = "";
 int _gAnimationId = 0;
 map<string, int> _gAnimationMapID;
 map<int, AnimationBase*> _gAnimations;
-map<EChromaSDKDevice1DEnum, int> _gPlayMap1D;
-map<EChromaSDKDevice2DEnum, int> _gPlayMap2D;
+map<EChromaSDKDeviceEnum, int> _gPlayMap;
 
 void SetupChromaThread()
 {
@@ -560,15 +559,8 @@ extern "C"
 					return -1;
 				}
 				PluginStopAnimationType(animation->GetDeviceTypeId(), animation->GetDeviceId());
-				switch (animation->GetDeviceType())
-				{
-				case EChromaSDKDeviceTypeEnum::DE_1D:
-					_gPlayMap1D[(EChromaSDKDevice1DEnum)animation->GetDeviceId()] = animationId;
-					break;
-				case EChromaSDKDeviceTypeEnum::DE_2D:
-					_gPlayMap2D[(EChromaSDKDevice2DEnum)animation->GetDeviceId()] = animationId;
-					break;
-				}
+				EChromaSDKDeviceEnum deviceEnum = animation->GetDeviceEnum();
+				_gPlayMap[deviceEnum] = animationId;
 				animation->Play(false);
 				return animationId;
 			}
@@ -632,24 +624,10 @@ extern "C"
 					return -1;
 				}
 				animation->Stop();
-				Animation1D* animation1D;
-				Animation2D* animation2D;
-				switch (animation->GetDeviceType())
+				EChromaSDKDeviceEnum deviceEnum = animation->GetDeviceEnum();
+				if (_gPlayMap[deviceEnum] == animationId)
 				{
-				case EChromaSDKDeviceTypeEnum::DE_1D:
-					animation1D = (Animation1D*)animation;
-					if (_gPlayMap1D[animation1D->GetDevice()] == animationId)
-					{
-						_gPlayMap1D[animation1D->GetDevice()] = -1;
-					}
-					break;
-				case EChromaSDKDeviceTypeEnum::DE_2D:
-					animation2D = (Animation2D*)animation;
-					if (_gPlayMap2D[animation2D->GetDevice()] == animationId)
-					{
-						_gPlayMap2D[animation2D->GetDevice()] = -1;
-					}
-					break;
+					_gPlayMap[deviceEnum] = -1;
 				}
 				return animationId;
 			}
@@ -731,8 +709,7 @@ extern "C"
 		_gAnimationId = 0;
 		_gAnimationMapID.clear();
 		_gAnimations.clear();
-		_gPlayMap1D.clear();
-		_gPlayMap2D.clear();
+		_gPlayMap.clear();
 
 		return ChromaSDKPlugin::GetInstance()->ChromaSDKInit();
 	}
@@ -758,8 +735,7 @@ extern "C"
 		_gAnimationId = 0;
 		_gAnimationMapID.clear();
 		_gAnimations.clear();
-		_gPlayMap1D.clear();
-		_gPlayMap2D.clear();
+		_gPlayMap.clear();
 		return result;
 	}
 
@@ -1642,40 +1618,39 @@ extern "C"
 			}
 			PluginStopAnimationType(animation->GetDeviceType(), animation->GetDeviceId());
 			//LogDebug("PluginPlayAnimationLoop: %s\r\n", animation->GetName().c_str());
+			EChromaSDKDeviceEnum deviceEnum = animation->GetDeviceEnum();
 			AnimationComposite* composite;
 			switch (animation->GetDeviceType())
 			{
 			case EChromaSDKDeviceTypeEnum::DE_1D:
-				_gPlayMap1D[(EChromaSDKDevice1DEnum)animation->GetDeviceId()] = animationId;
-				break;
 			case EChromaSDKDeviceTypeEnum::DE_2D:
-				_gPlayMap2D[(EChromaSDKDevice2DEnum)animation->GetDeviceId()] = animationId;
+				_gPlayMap[deviceEnum] = animationId;
 				break;
 			case EChromaSDKDeviceTypeEnum::DE_Composite:
 				composite = (AnimationComposite*)animation;
 				if (composite->GetChromaLink() != nullptr)
 				{
-					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_ChromaLink] = PluginGetAnimationIdFromInstance(composite->GetChromaLink());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_ChromaLink] = PluginGetAnimationIdFromInstance(composite->GetChromaLink());
 				}
 				if (composite->GetHeadset() != nullptr)
 				{
-					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_Headset] = PluginGetAnimationIdFromInstance(composite->GetHeadset());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Headset] = PluginGetAnimationIdFromInstance(composite->GetHeadset());
 				}
 				if (composite->GetKeyboard() != nullptr)
 				{
-					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Keyboard] = PluginGetAnimationIdFromInstance(composite->GetKeyboard());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Keyboard] = PluginGetAnimationIdFromInstance(composite->GetKeyboard());
 				}
 				if (composite->GetKeypad() != nullptr)
 				{
-					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Keypad] = PluginGetAnimationIdFromInstance(composite->GetKeypad());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Keypad] = PluginGetAnimationIdFromInstance(composite->GetKeypad());
 				}
 				if (composite->GetMouse() != nullptr)
 				{
-					_gPlayMap2D[EChromaSDKDevice2DEnum::DE_Mouse] = PluginGetAnimationIdFromInstance(composite->GetMouse());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Mouse] = PluginGetAnimationIdFromInstance(composite->GetMouse());
 				}
 				if (composite->GetMousepad() != nullptr)
 				{
-					_gPlayMap1D[EChromaSDKDevice1DEnum::DE_Mousepad] = PluginGetAnimationIdFromInstance(composite->GetMousepad());
+					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Mousepad] = PluginGetAnimationIdFromInstance(composite->GetMousepad());
 				}
 				break;
 			}
@@ -1720,13 +1695,12 @@ extern "C"
 			PluginStopAnimationType(animation->GetDeviceType(), animation->GetDeviceId());
 			//LogDebug("PluginPlayAnimationFrame: %s\r\n", animation->GetName().c_str());
 			animation->SetCurrentFrame(frameId);
+			EChromaSDKDeviceEnum deviceEnum = animation->GetDeviceEnum();
 			switch (animation->GetDeviceType())
 			{
 			case EChromaSDKDeviceTypeEnum::DE_1D:
-				_gPlayMap1D[(EChromaSDKDevice1DEnum)animation->GetDeviceId()] = animationId;
-				break;
 			case EChromaSDKDeviceTypeEnum::DE_2D:
-				_gPlayMap2D[(EChromaSDKDevice2DEnum)animation->GetDeviceId()] = animationId;
+				_gPlayMap[deviceEnum] = animationId;
 				break;
 			}
 			animation->Play(loop);
@@ -1776,27 +1750,18 @@ extern "C"
 
 	EXPORT_API void PluginStopAnimationType(int deviceType, int device)
 	{
+		EChromaSDKDeviceEnum deviceEnum = ChromaSDKPlugin::GetInstance()->GetDeviceEnum(deviceType, device);
 		switch ((EChromaSDKDeviceTypeEnum)deviceType)
 		{
 		case EChromaSDKDeviceTypeEnum::DE_1D:
-			if (_gPlayMap1D.find((EChromaSDKDevice1DEnum)device) != _gPlayMap1D.end())
-			{
-				int prevAnimation = _gPlayMap1D[(EChromaSDKDevice1DEnum)device];
-				if (prevAnimation != -1)
-				{
-					PluginStopAnimation(prevAnimation);
-					_gPlayMap1D[(EChromaSDKDevice1DEnum)device] = -1;
-				}
-			}
-			break;
 		case EChromaSDKDeviceTypeEnum::DE_2D:
-			if (_gPlayMap2D.find((EChromaSDKDevice2DEnum)device) != _gPlayMap2D.end())
+			if (_gPlayMap.find(deviceEnum) != _gPlayMap.end())
 			{
-				int prevAnimation = _gPlayMap2D[(EChromaSDKDevice2DEnum)device];
+				int prevAnimation = _gPlayMap[deviceEnum];
 				if (prevAnimation != -1)
 				{
 					PluginStopAnimation(prevAnimation);
-					_gPlayMap2D[(EChromaSDKDevice2DEnum)device] = -1;
+					_gPlayMap[deviceEnum] = -1;
 				}
 			}
 			break;
@@ -1842,25 +1807,15 @@ extern "C"
 
 	EXPORT_API bool PluginIsPlayingType(int deviceType, int device)
 	{
+		EChromaSDKDeviceEnum deviceEnum = ChromaSDKPlugin::GetInstance()->GetDeviceEnum(deviceType, device);
 		switch ((EChromaSDKDeviceTypeEnum)deviceType)
 		{
 		case EChromaSDKDeviceTypeEnum::DE_1D:
-			{
-				if (_gPlayMap1D.find((EChromaSDKDevice1DEnum)device) != _gPlayMap1D.end())
-				{
-					int prevAnimation = _gPlayMap1D[(EChromaSDKDevice1DEnum)device];
-					if (prevAnimation != -1)
-					{
-						return PluginIsPlaying(prevAnimation);
-					}
-				}
-			}
-			break;
 		case EChromaSDKDeviceTypeEnum::DE_2D:
 			{
-				if (_gPlayMap2D.find((EChromaSDKDevice2DEnum)device) != _gPlayMap2D.end())
+				if (_gPlayMap.find(deviceEnum) != _gPlayMap.end())
 				{
-					int prevAnimation = _gPlayMap2D[(EChromaSDKDevice2DEnum)device];
+					int prevAnimation = _gPlayMap[deviceEnum];
 					if (prevAnimation != -1)
 					{
 						return PluginIsPlaying(prevAnimation);

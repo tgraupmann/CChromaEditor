@@ -10,6 +10,7 @@ namespace ChromaSDK
 	public:
 		Animation2D();
 		void Reset();
+		virtual EChromaSDKDeviceEnum GetDeviceEnum();
 		EChromaSDKDeviceTypeEnum GetDeviceType();
 		EChromaSDKDevice2DEnum GetDevice();
 		bool SetDevice(EChromaSDKDevice2DEnum device);
