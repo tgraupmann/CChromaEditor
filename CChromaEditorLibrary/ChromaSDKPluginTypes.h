@@ -33,13 +33,13 @@ namespace ChromaSDK
 
 	enum EChromaSDKDeviceEnum
 	{
-		EDIT_ChromaLink = 0,
-		EDIT_Headset = 1,
-		EDIT_Keyboard = 2,
-		EDIT_Keypad = 3,
-		EDIT_Mouse = 4,
-		EDIT_Mousepad = 5,
-		EDIT_Composite = 6,
+		DDE_ChromaLink = 0,
+		DDE_Headset = 1,
+		DDE_Keyboard = 2,
+		DDE_Keypad = 3,
+		DDE_Mouse = 4,
+		DDE_Mousepad = 5,
+		DDE_Composite = 6,
 	};
 
 	enum EChromaSDKDevice1DEnum

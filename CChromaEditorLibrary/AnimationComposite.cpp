@@ -67,17 +67,17 @@ namespace ChromaSDK
 	{
 		switch (device)
 		{
-		case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+		case EChromaSDKDeviceEnum::DDE_ChromaLink:
 			return GetChromaLink();
-		case EChromaSDKDeviceEnum::EDIT_Headset:
+		case EChromaSDKDeviceEnum::DDE_Headset:
 			return GetHeadset();
-		case EChromaSDKDeviceEnum::EDIT_Keyboard:
+		case EChromaSDKDeviceEnum::DDE_Keyboard:
 			return GetKeyboard();
-		case EChromaSDKDeviceEnum::EDIT_Keypad:
+		case EChromaSDKDeviceEnum::DDE_Keypad:
 			return GetKeypad();
-		case EChromaSDKDeviceEnum::EDIT_Mouse:
+		case EChromaSDKDeviceEnum::DDE_Mouse:
 			return GetMouse();
-		case EChromaSDKDeviceEnum::EDIT_Mousepad:
+		case EChromaSDKDeviceEnum::DDE_Mousepad:
 			return GetMousepad();
 		}
 	}
@@ -407,7 +407,7 @@ namespace ChromaSDK
 	}
 	EChromaSDKDeviceEnum AnimationComposite::GetDeviceEnum()
 	{
-		return EChromaSDKDeviceEnum::EDIT_Composite;
+		return EChromaSDKDeviceEnum::DDE_Composite;
 	}
 	EChromaSDKDeviceTypeEnum AnimationComposite::GetDeviceType()
 	{

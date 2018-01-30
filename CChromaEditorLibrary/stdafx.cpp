@@ -1630,27 +1630,27 @@ extern "C"
 				composite = (AnimationComposite*)animation;
 				if (composite->GetChromaLink() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_ChromaLink] = PluginGetAnimationIdFromInstance(composite->GetChromaLink());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_ChromaLink] = PluginGetAnimationIdFromInstance(composite->GetChromaLink());
 				}
 				if (composite->GetHeadset() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Headset] = PluginGetAnimationIdFromInstance(composite->GetHeadset());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_Headset] = PluginGetAnimationIdFromInstance(composite->GetHeadset());
 				}
 				if (composite->GetKeyboard() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Keyboard] = PluginGetAnimationIdFromInstance(composite->GetKeyboard());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_Keyboard] = PluginGetAnimationIdFromInstance(composite->GetKeyboard());
 				}
 				if (composite->GetKeypad() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Keypad] = PluginGetAnimationIdFromInstance(composite->GetKeypad());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_Keypad] = PluginGetAnimationIdFromInstance(composite->GetKeypad());
 				}
 				if (composite->GetMouse() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Mouse] = PluginGetAnimationIdFromInstance(composite->GetMouse());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_Mouse] = PluginGetAnimationIdFromInstance(composite->GetMouse());
 				}
 				if (composite->GetMousepad() != nullptr)
 				{
-					_gPlayMap[EChromaSDKDeviceEnum::EDIT_Mousepad] = PluginGetAnimationIdFromInstance(composite->GetMousepad());
+					_gPlayMap[EChromaSDKDeviceEnum::DDE_Mousepad] = PluginGetAnimationIdFromInstance(composite->GetMousepad());
 				}
 				break;
 			}

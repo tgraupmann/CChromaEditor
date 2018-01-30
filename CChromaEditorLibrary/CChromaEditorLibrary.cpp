@@ -104,13 +104,13 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 		switch (((Animation1D*)animation)->GetDevice())
 		{
 		case EChromaSDKDevice1DEnum::DE_ChromaLink:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_ChromaLink;
+			_mDevice = EChromaSDKDeviceEnum::DDE_ChromaLink;
 			break;
 		case EChromaSDKDevice1DEnum::DE_Headset:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_Headset;
+			_mDevice = EChromaSDKDeviceEnum::DDE_Headset;
 			break;
 		case EChromaSDKDevice1DEnum::DE_Mousepad:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_Mousepad;
+			_mDevice = EChromaSDKDeviceEnum::DDE_Mousepad;
 			break;
 		}
 		break;
@@ -118,13 +118,13 @@ void CMainViewDlg::SetDeviceType(AnimationBase* animation)
 		switch (((Animation2D*)animation)->GetDevice())
 		{
 		case EChromaSDKDevice2DEnum::DE_Keyboard:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_Keyboard;
+			_mDevice = EChromaSDKDeviceEnum::DDE_Keyboard;
 			break;
 		case EChromaSDKDevice2DEnum::DE_Keypad:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_Keypad;
+			_mDevice = EChromaSDKDeviceEnum::DDE_Keypad;
 			break;
 		case EChromaSDKDevice2DEnum::DE_Mouse:
-			_mDevice = EChromaSDKDeviceEnum::EDIT_Mouse;
+			_mDevice = EChromaSDKDeviceEnum::DDE_Mouse;
 			break;
 		}
 		break;
@@ -423,17 +423,17 @@ float CMainViewDlg::GetDuration()
 
 void CMainViewDlg::RefreshDevice()
 {
-	int show = _mDevice == EChromaSDKDeviceEnum::EDIT_Keyboard;
+	int show = _mDevice == EChromaSDKDeviceEnum::DDE_Keyboard;
 	GetControlSetKeyLabel()->ShowWindow(show);
 	GetControlSetKeyCombo()->ShowWindow(show);
 	GetControlSetKeyButton()->ShowWindow(show);
 
-	show = _mDevice == EChromaSDKDeviceEnum::EDIT_Mouse;
+	show = _mDevice == EChromaSDKDeviceEnum::DDE_Mouse;
 	GetControlSetLEDLabel()->ShowWindow(show);
 	GetControlSetLEDCombo()->ShowWindow(show);
 	GetControlSetLEDButton()->ShowWindow(show);
 
-	show = _mDevice == EChromaSDKDeviceEnum::EDIT_Keyboard && GetAnimation() != nullptr;
+	show = _mDevice == EChromaSDKDeviceEnum::DDE_Keyboard && GetAnimation() != nullptr;
 	GetControlUseKeyboardCustomKeys()->ShowWindow(show);
 	if (show)
 	{
@@ -878,32 +878,32 @@ void CMainViewDlg::OnSelChangeListTypes()
 	case 0:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
 		device1D = EChromaSDKDevice1DEnum::DE_ChromaLink;
-		device = EChromaSDKDeviceEnum::EDIT_ChromaLink;
+		device = EChromaSDKDeviceEnum::DDE_ChromaLink;
 		break;
 	case 1:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
 		device1D = EChromaSDKDevice1DEnum::DE_Headset;
-		device = EChromaSDKDeviceEnum::EDIT_Headset;
+		device = EChromaSDKDeviceEnum::DDE_Headset;
 		break;
 	case 2:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
 		device2D = EChromaSDKDevice2DEnum::DE_Keyboard;
-		device = EChromaSDKDeviceEnum::EDIT_Keyboard;
+		device = EChromaSDKDeviceEnum::DDE_Keyboard;
 		break;
 	case 3:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
 		device2D = EChromaSDKDevice2DEnum::DE_Keypad;
-		device = EChromaSDKDeviceEnum::EDIT_Keypad;
+		device = EChromaSDKDeviceEnum::DDE_Keypad;
 		break;
 	case 4:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_2D;
 		device2D = EChromaSDKDevice2DEnum::DE_Mouse;
-		device = EChromaSDKDeviceEnum::EDIT_Mouse;
+		device = EChromaSDKDeviceEnum::DDE_Mouse;
 		break;
 	case 5:
 		deviceType = EChromaSDKDeviceTypeEnum::DE_1D;
 		device1D = EChromaSDKDevice1DEnum::DE_Mousepad;
-		device = EChromaSDKDeviceEnum::EDIT_Mousepad;
+		device = EChromaSDKDeviceEnum::DDE_Mousepad;
 		break;
 	default:
 		return;
@@ -1818,17 +1818,17 @@ EChromaSDKDeviceTypeEnum CMainViewDlg::GetDeviceType()
 {
 	switch (_mDevice)
 	{
-	case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+	case EChromaSDKDeviceEnum::DDE_ChromaLink:
 		return EChromaSDKDeviceTypeEnum::DE_1D;
-	case EChromaSDKDeviceEnum::EDIT_Headset:
+	case EChromaSDKDeviceEnum::DDE_Headset:
 		return EChromaSDKDeviceTypeEnum::DE_1D;
-	case EChromaSDKDeviceEnum::EDIT_Keyboard:
+	case EChromaSDKDeviceEnum::DDE_Keyboard:
 		return EChromaSDKDeviceTypeEnum::DE_2D;
-	case EChromaSDKDeviceEnum::EDIT_Keypad:
+	case EChromaSDKDeviceEnum::DDE_Keypad:
 		return EChromaSDKDeviceTypeEnum::DE_2D;
-	case EChromaSDKDeviceEnum::EDIT_Mouse:
+	case EChromaSDKDeviceEnum::DDE_Mouse:
 		return EChromaSDKDeviceTypeEnum::DE_2D;
-	case EChromaSDKDeviceEnum::EDIT_Mousepad:
+	case EChromaSDKDeviceEnum::DDE_Mousepad:
 		return EChromaSDKDeviceTypeEnum::DE_1D;
 	default:
 		return EChromaSDKDeviceTypeEnum::DE_1D;
@@ -1839,17 +1839,17 @@ EditorAnimationBase* CMainViewDlg::GetEditor()
 {
 	switch (_mDevice)
 	{
-	case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+	case EChromaSDKDeviceEnum::DDE_ChromaLink:
 		return &_mEditChromaLink;
-	case EChromaSDKDeviceEnum::EDIT_Headset:
+	case EChromaSDKDeviceEnum::DDE_Headset:
 		return &_mEditHeadset;
-	case EChromaSDKDeviceEnum::EDIT_Keyboard:
+	case EChromaSDKDeviceEnum::DDE_Keyboard:
 		return &_mEditKeyboard;
-	case EChromaSDKDeviceEnum::EDIT_Keypad:
+	case EChromaSDKDeviceEnum::DDE_Keypad:
 		return &_mEditKeypad;
-	case EChromaSDKDeviceEnum::EDIT_Mouse:
+	case EChromaSDKDeviceEnum::DDE_Mouse:
 		return &_mEditMouse;
-	case EChromaSDKDeviceEnum::EDIT_Mousepad:
+	case EChromaSDKDeviceEnum::DDE_Mousepad:
 		return &_mEditMousepad;
 	default:
 		return nullptr;
@@ -1905,37 +1905,37 @@ void CMainViewDlg::OnBnClickedButtonEnable()
 
 		switch (_mDevice)
 		{
-		case EChromaSDKDeviceEnum::EDIT_ChromaLink:
+		case EChromaSDKDeviceEnum::DDE_ChromaLink:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_ChromaLink);
 			animation = GetAnimationInstance(animationId);
 			_mEditChromaLink.SetAnimation(animation);
 			_mEditChromaLink.Reset();
 			break;
-		case EChromaSDKDeviceEnum::EDIT_Headset:
+		case EChromaSDKDeviceEnum::DDE_Headset:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Headset);
 			animation = GetAnimationInstance(animationId);
 			_mEditHeadset.SetAnimation(animation);
 			_mEditHeadset.Reset();
 			break;
-		case EChromaSDKDeviceEnum::EDIT_Keyboard:
+		case EChromaSDKDeviceEnum::DDE_Keyboard:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keyboard);
 			animation = GetAnimationInstance(animationId);
 			_mEditKeyboard.SetAnimation(animation);
 			_mEditKeyboard.Reset();
 			break;
-		case EChromaSDKDeviceEnum::EDIT_Keypad:
+		case EChromaSDKDeviceEnum::DDE_Keypad:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Keypad);
 			animation = GetAnimationInstance(animationId);
 			_mEditKeypad.SetAnimation(animation);
 			_mEditKeypad.Reset();
 			break;
-		case EChromaSDKDeviceEnum::EDIT_Mouse:
+		case EChromaSDKDeviceEnum::DDE_Mouse:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_2D, (int)EChromaSDKDevice2DEnum::DE_Mouse);
 			animation = GetAnimationInstance(animationId);
 			_mEditMouse.SetAnimation(animation);
 			_mEditMouse.Reset();
 			break;
-		case EChromaSDKDeviceEnum::EDIT_Mousepad:
+		case EChromaSDKDeviceEnum::DDE_Mousepad:
 			animationId = PluginCreateAnimationInMemory((int)EChromaSDKDeviceTypeEnum::DE_1D, (int)EChromaSDKDevice1DEnum::DE_Mousepad);
 			animation = GetAnimationInstance(animationId);
 			_mEditMousepad.SetAnimation(animation);
