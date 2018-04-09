@@ -149,7 +149,6 @@ private:
 	std::string _mPath;
 	bool _mPlayOnOpen;
 
-	CMenu* GetControlMenu();
 	CListBox* GetControlListTypes();
 	CButton* GetEnabledButton();
 	CEdit* GetControlOverrideTime();

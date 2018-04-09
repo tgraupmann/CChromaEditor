@@ -743,11 +743,6 @@ void CMainViewDlg::RefreshFrames()
 	GetControlDuration()->SetWindowText(CString(bufferDuration));
 }
 
-CMenu* CMainViewDlg::GetControlMenu()
-{
-	return (CMenu*)GetDlgItem(IDR_MENU1);
-}
-
 CListBox* CMainViewDlg::GetControlListTypes()
 {
 	return (CListBox*)GetDlgItem(IDC_LIST_TYPES);
@@ -2026,6 +2021,7 @@ void CMainViewDlg::OnBnClickedButtonSetKey()
 			EChromaSDKKeyboardKey key = (EChromaSDKKeyboardKey)id;
 			std::vector<FChromaSDKColors>& colors = frame.Colors;
 			ChromaSDKPlugin::GetInstance()->SetKeyboardKeyColor(key, GetColor(), colors);
+			SetCurrentFrame2D(frame);
 			RefreshGrid();
 		}
 	}
